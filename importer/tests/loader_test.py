@@ -1,9 +1,10 @@
 import unittest
+
 from importer.loader import SpreadsheetLoader
 from importer.model import Spreadsheet, RawRead
 
 
-class TestDocument(unittest.TestCase):
+class TestLoader(unittest.TestCase):
 
     def test_header_initialization(self):
         loader = SpreadsheetLoader("test_upload.xls")
