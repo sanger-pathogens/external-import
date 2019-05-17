@@ -1,26 +1,102 @@
 import re
 
+from collections import defaultdict
+
 
 def validate_study_name(spreadsheet):
     invalid_chars = re.findall("[^\\w_\\d]", spreadsheet.name)
     return ["Invalid chars %s found in study name" % x for x in invalid_chars]
 
 
+def validate_external_data_part_of_internal_sequencing_study_name(spreadsheet):
+    if not spreadsheet.part_of_internal_sequencing_study:
+        return []
+    name = re.findall("^\\d+_external$", spreadsheet.name)
+    if spreadsheet.name in name:
+        return []
+    return ["Invalid name for data part of internal sequencing study %s" % spreadsheet.name]
+
+
 def validate_study_name_length(spreadsheet):
     return [] if len(spreadsheet.name) <= 15 else ["Spreadsheet name longer than 15 chars"]
 
-#the study title does not have any odd characters and is reasonably short as this will be used with the pf scripts (i.e. don't use a full paper title)
-# the study title is not the the same as an internal study (you can check this with pf data -t study -i "STUDY NAME"). If it is, add the word "external" to the end (e.g. 1234_external)
-# the columns marked as green are filled in (except _Base Count_ and _Fragment Size_).
 
-#If the Library Name column is not completed then copy over the values from the Sample Name column.
+def validate_mandatory_read_fields(spreadsheet):
+    read_errors = [validate_mandatory_read_fields_for_read(read) for read in spreadsheet.reads]
+    return [item for sublist in read_errors for item in sublist]
 
-#     the fastq files are named _1 and _2 and are gzipped. If they are not, either tell the user to fix this or rename them yourself.
-#    NOTE: The file names (up until _1) will become the lane_ids. Check that they are unique in the database (you can check this with pf data -t lane -i "FILE NAME").
-# the sample names and library names are named uniquely within the spreadsheet
-# the sample names and library names are unique within the database (you can check this with pf data -t sample -i SAMPLE_NAME)
-# the user has not included the complete file path in the spreadsheet. If so, either ask the user to remove the paths and just leave the file names, or do it yourself.
-# to add a 'Data to be kept until' date (e.g. 01/01/2022) and a 'Total size of files in GBytes' value (e.g. use du -ch ./*.gz | grep total)
-# If the data is to be included as part of an internal sequencing study, it should still be imported into an external database and the study name should be the same as the internal study name with word 'external' at the end of the study name
+
+def validate_mandatory_read_fields_for_read(read):
+    result = []
+    if read.forward_read is None:
+        result.append("Missing forward_read for %s" % str(read))
+    if read.sample_name is None:
+        result.append("Missing sample name for %s" % str(read))
+    if read.taxon_id is None:
+        result.append("Missing taxon id for %s" % str(read))
+    if read.library_name is None:
+        result.append("Missing library name for %s" % str(read))
+    return result
+
+
+def validate_files_are_compressed(spreadsheet):
+    read_errors = [validate_files_are_compressed_for_read(read) for read in spreadsheet.reads]
+    return [item for sublist in read_errors for item in sublist]
+
+
+def validate_files_are_compressed_for_read(read):
+    result = []
+    if not read.forward_read.endswith(".gz"):
+        result.append("Forward read is not compressed with gz for %s" % str(read))
+    if read.reverse_read is not None and not read.reverse_read.endswith(".gz"):
+        result.append("Reverse read is not compressed with gz for %s" % str(read))
+    return result
+
+
+def validate_pair_naming_convention(spreadsheet):
+    read_errors = [validate_pair_naming_convention_for_read(read) for read in spreadsheet.reads]
+    return [item for sublist in read_errors for item in sublist]
+
+
+def validate_pair_naming_convention_for_read(read):
+    result = []
+    if read.reverse_read is not None and read.reverse_read.replace("_2.", "_1.") != read.forward_read:
+        result.append("Inconsistent naming convention of forward and reverse reads for %s" % str(read))
+    return result
+
+
+def validate_uniqueness_of_reads(spreadsheet):
+    forward_read = defaultdict(int)
+    reverse_read = defaultdict(int)
+    sample_name = defaultdict(int)
+    library_name = defaultdict(int)
+    for read in spreadsheet.reads:
+        forward_read[read.forward_read] += 1
+        if read.reverse_read is not None:
+            reverse_read[read.reverse_read] += 1
+        sample_name[read.sample_name] += 1
+        library_name[read.library_name] += 1
+
+    invalid_forwad_read = ["Forward read is not unique: %s" % k for k, v in forward_read.items() if v > 1]
+    invalid_reverse_read = ["Reverse read is not unique: %s" % k for k, v in reverse_read.items() if v > 1]
+    invalid_sample_name = ["Sample name is not unique: %s" % k for k, v in sample_name.items() if v > 1]
+    invalid_library_name = ["Library name is not unique: %s" % k for k, v in library_name.items() if v > 1]
+
+    return invalid_forwad_read + invalid_reverse_read + invalid_sample_name + invalid_library_name;
+
+
+def validate_no_path_in_filename(spreadsheet):
+    read_errors = [validate_no_path_in_filename_for_read(read) for read in spreadsheet.reads]
+    return [item for sublist in read_errors for item in sublist]
+
+
+def validate_no_path_in_filename_for_read(read):
+    result = []
+    if "/" in read.forward_read:
+        result.append("Path present in filename: %s" % str(read.forward_read))
+    if read.reverse_read is not None and "/" in read.reverse_read:
+        result.append("Path present in filename: %s" % str(read.reverse_read))
+    return result
+
+
 # Save the spreadsheet as external_XXXX.xls where XXXX is the RT ticket number
-
