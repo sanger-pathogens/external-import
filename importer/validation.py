@@ -22,11 +22,11 @@ def validate_study_name_length(spreadsheet):
 
 
 def validate_mandatory_read_fields(spreadsheet):
-    read_errors = [validate_mandatory_read_fields_for_read(read) for read in spreadsheet.reads]
+    read_errors = [__validate_mandatory_read_fields_for_read(read) for read in spreadsheet.reads]
     return [item for sublist in read_errors for item in sublist]
 
 
-def validate_mandatory_read_fields_for_read(read):
+def __validate_mandatory_read_fields_for_read(read):
     result = []
     if read.forward_read is None:
         result.append("Missing forward_read for %s" % str(read))
@@ -40,11 +40,11 @@ def validate_mandatory_read_fields_for_read(read):
 
 
 def validate_files_are_compressed(spreadsheet):
-    read_errors = [validate_files_are_compressed_for_read(read) for read in spreadsheet.reads]
+    read_errors = [__validate_files_are_compressed_for_read(read) for read in spreadsheet.reads]
     return [item for sublist in read_errors for item in sublist]
 
 
-def validate_files_are_compressed_for_read(read):
+def __validate_files_are_compressed_for_read(read):
     result = []
     if not read.forward_read.endswith(".gz"):
         result.append("Forward read is not compressed with gz for %s" % str(read))
@@ -54,11 +54,11 @@ def validate_files_are_compressed_for_read(read):
 
 
 def validate_pair_naming_convention(spreadsheet):
-    read_errors = [validate_pair_naming_convention_for_read(read) for read in spreadsheet.reads]
+    read_errors = [__validate_pair_naming_convention_for_read(read) for read in spreadsheet.reads]
     return [item for sublist in read_errors for item in sublist]
 
 
-def validate_pair_naming_convention_for_read(read):
+def __validate_pair_naming_convention_for_read(read):
     result = []
     if read.reverse_read is not None and read.reverse_read.replace("_2.", "_1.") != read.forward_read:
         result.append("Inconsistent naming convention of forward and reverse reads for %s" % str(read))
@@ -86,11 +86,11 @@ def validate_uniqueness_of_reads(spreadsheet):
 
 
 def validate_no_path_in_filename(spreadsheet):
-    read_errors = [validate_no_path_in_filename_for_read(read) for read in spreadsheet.reads]
+    read_errors = [__validate_no_path_in_filename_for_read(read) for read in spreadsheet.reads]
     return [item for sublist in read_errors for item in sublist]
 
 
-def validate_no_path_in_filename_for_read(read):
+def __validate_no_path_in_filename_for_read(read):
     result = []
     if "/" in read.forward_read:
         result.append("Path present in filename: %s" % str(read.forward_read))
@@ -99,4 +99,3 @@ def validate_no_path_in_filename_for_read(read):
     return result
 
 
-# Save the spreadsheet as external_XXXX.xls where XXXX is the RT ticket number

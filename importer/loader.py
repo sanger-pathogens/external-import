@@ -35,19 +35,18 @@ class SpreadsheetLoader:
                 library_name_column = i
         reads = []
         for i in range(data_row, self._sheet.nrows):
-            sample_name = convert_empty_to_none(self._sheet.cell_value(i, sample_name_column))
-            library_name = convert_empty_to_none(self._sheet.cell_value(i, library_name_column))
+            sample_name = self.__convert_empty_to_none(self._sheet.cell_value(i, sample_name_column))
+            library_name = self.__convert_empty_to_none(self._sheet.cell_value(i, library_name_column))
             if library_name is None:
                 library_name = sample_name
             reads.append(RawRead(
-                convert_empty_to_none(self._sheet.cell_value(i, filename_column)),
-                convert_empty_to_none(self._sheet.cell_value(i, mate_filename_column)),
+                self.__convert_empty_to_none(self._sheet.cell_value(i, filename_column)),
+                self.__convert_empty_to_none(self._sheet.cell_value(i, mate_filename_column)),
                 sample_name,
-                convert_empty_to_none(self._sheet.cell_value(i, taxon_id_column)),
+                self.__convert_empty_to_none(self._sheet.cell_value(i, taxon_id_column)),
                 library_name))
 
         return Spreadsheet(study, reads)
 
-
-def convert_empty_to_none(data):
-    return None if data == '' else data
+    def __convert_empty_to_none(self, data):
+        return None if data == '' else data

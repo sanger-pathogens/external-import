@@ -15,7 +15,7 @@ class TestLoader(unittest.TestCase):
         actual = loader.load()
         self.assertSpreadsheet(expected, actual)
 
-    def test_header_initialization_2(self):
+    def test_header_initialization_no_reverse_read(self):
         loader = SpreadsheetLoader("test_upload_no_pair.xls")
 
         expected = Spreadsheet("MyStudy", [
@@ -26,7 +26,7 @@ class TestLoader(unittest.TestCase):
         actual = loader.load()
         self.assertSpreadsheet(expected, actual)
 
-    def test_header_initialization_3(self):
+    def test_header_initialization_no_library_name(self):
         loader = SpreadsheetLoader("test_upload_no_pair_no_lib.xls")
 
         expected = Spreadsheet("MyStudy", [
