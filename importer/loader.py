@@ -1,6 +1,6 @@
 import xlrd
 
-from model import Spreadsheet, RawRead
+from importer.model import Spreadsheet, RawRead
 
 
 class SpreadsheetLoader:
