@@ -19,7 +19,7 @@ def validate(arguments):
     if result:
         print(result)
     else:
-        print_pf_checks(sheet)
+        print_pf_checks(sheet, arguments.output)
 
 
 def prepare(arguments):

@@ -16,6 +16,8 @@ class ArgumentParser:
         validation_parser.add_argument('-s', '--spreadsheet', required=True, help='Spreadsheet to validate')
         validation_parser.add_argument('-i', '--internal', dest='part_of_internal_study', action="store_true",
                                        default=False, help='External data part of an internally sequenced study')
+        validation_parser.add_argument('-o', '--output', required=True,
+                                       help='Output director for generated lane and sample files for pf')
         validation_parser.set_defaults(execute=self.validation_function)
 
         # Experimental => needs rewriting
