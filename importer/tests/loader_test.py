@@ -43,4 +43,4 @@ class TestLoader(unittest.TestCase):
 
     def assertSpreadsheet(self, expected, actual):
         self.maxDiff = None
-        self.assertEquals(expected.__dict__, actual.__dict__)
+        self.assertEqual(expected.__dict__, actual.__dict__)

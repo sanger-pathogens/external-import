@@ -5,7 +5,7 @@ from unittest.mock import Mock
 from importer.argument_parser import ArgumentParser
 
 
-class TestArguments(unittest.TestCase):
+class TestValidateCommandArguments(unittest.TestCase):
 
     def setUp(self):
         self.validation_function = Mock()
@@ -15,7 +15,7 @@ class TestArguments(unittest.TestCase):
         actual = self.under_test.parse(["validate", "-s", "test_upload.xls", "-i"])
         expected = argparse.Namespace(execute=self.validation_function, spreadsheet="test_upload.xls",
                                       part_of_internal_study=True)
-        self.assertEquals(actual, expected)
+        self.assertEqual(actual, expected)
 
     def test_should_parse_when_not_part_of_internal_study(self):
         actual = self.under_test.parse(["validate", "-s", "test_upload.xls"])
