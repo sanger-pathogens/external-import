@@ -5,11 +5,10 @@ from importer.model import Spreadsheet, RawRead
 
 class SpreadsheetLoader:
 
-    def __init__(self, file, part_of_internally_sequenced_study=False):
+    def __init__(self, file):
         self._file = file
         self._workbook = xlrd.open_workbook(self._file)
         self._sheet = self._workbook.sheet_by_index(0)
-        self.part_of_internally_sequenced_study = part_of_internally_sequenced_study
 
     def load(self):
         data_row = 0
@@ -47,7 +46,7 @@ class SpreadsheetLoader:
                 self.__extract_float_value(i, taxon_id_column),
                 library_name))
 
-        return Spreadsheet(study, reads, self.part_of_internally_sequenced_study)
+        return Spreadsheet(study, reads)
 
     def __extract_text_value(self, row, column):
         new_data = self._sheet.cell_value(row, column).strip()

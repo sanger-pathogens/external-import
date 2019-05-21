@@ -33,18 +33,15 @@ class TestStudyNameLength(unittest.TestCase):
 
 class TestStudyNameWhenPartOfInternalSequencing(unittest.TestCase):
 
-    def test_external_data_not_check_on_normal_import(self):
-        self.assertEqual([], validate_external_data_part_of_internal_sequencing_study_name(Spreadsheet(
-            "ValidName12345__", [], False)))
-
     def test_invalid_name_for_external_data_part_of_internal_study(self):
-        self.assertEqual(["Invalid name for data part of internal sequencing study ValidName12345__"],
-                         validate_external_data_part_of_internal_sequencing_study_name(Spreadsheet("ValidName12345__",
-                                                                                                   [], True)))
+        self.assertEqual(["Data part of internal sequencing study should have the suffix '_external' in the name: "
+                          "ValidName12345__"],
+                         validate_external_data_part_of_internal_sequencing_study_name(
+                             Spreadsheet("ValidName12345__", [])))
 
     def test_valid_name_for_external_data_part_of_internal_study(self):
-        self.assertEqual([], validate_external_data_part_of_internal_sequencing_study_name(Spreadsheet("345_external",
-                                                                                                       [], True)))
+        self.assertEqual([], validate_external_data_part_of_internal_sequencing_study_name(
+            Spreadsheet("345_external", [])))
 
 
 class TestValidateNoPathInFilename(unittest.TestCase):

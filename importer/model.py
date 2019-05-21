@@ -5,7 +5,6 @@ RawRead = namedtuple('RawRead', 'forward_read, reverse_read, sample_name, taxon_
 
 class Spreadsheet:
 
-    def __init__(self, name, reads=[], part_of_internal_sequencing_study=False):
+    def __init__(self, name, reads=[]):
         self.name = name
         self.reads = reads
-        self.part_of_internal_sequencing_study = part_of_internal_sequencing_study

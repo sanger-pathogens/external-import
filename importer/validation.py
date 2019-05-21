@@ -5,17 +5,19 @@ from typing import List
 from importer.model import Spreadsheet, RawRead
 
 
-def validate_spreadsheet(spreadsheet: Spreadsheet):
+def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool):
     results = []
-    for validator in [validate_study_name_length,
-                      validate_study_name,
-                      validate_external_data_part_of_internal_sequencing_study_name,
-                      validate_mandatory_read_fields,
-                      validate_files_are_compressed,
-                      validate_pair_naming_convention,
-                      validate_uniqueness_of_reads,
-                      validate_no_path_in_filename,
-                      ]:
+    validators = [validate_study_name_length,
+                  validate_study_name,
+                  validate_mandatory_read_fields,
+                  validate_files_are_compressed,
+                  validate_pair_naming_convention,
+                  validate_uniqueness_of_reads,
+                  validate_no_path_in_filename,
+                  ]
+    if part_of_internal_study:
+        validators.append(validate_external_data_part_of_internal_sequencing_study_name)
+    for validator in validators:
         results += validator(spreadsheet)
     return results
 
@@ -26,12 +28,11 @@ def validate_study_name(spreadsheet: Spreadsheet) -> List[str]:
 
 
 def validate_external_data_part_of_internal_sequencing_study_name(spreadsheet: Spreadsheet) -> List[str]:
-    if not spreadsheet.part_of_internal_sequencing_study:
-        return []
     name = re.findall("^\\d+_external$", spreadsheet.name)
     if spreadsheet.name in name:
         return []
-    return ["Invalid name for data part of internal sequencing study %s" % spreadsheet.name]
+    return ["Data part of internal sequencing study should have the suffix '_external' in the name: %s"
+            % spreadsheet.name]
 
 
 def validate_study_name_length(spreadsheet: Spreadsheet) -> List[str]:

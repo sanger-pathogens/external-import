@@ -13,9 +13,9 @@ from importer.writer import save, output_dir, copy_files, spreadsheet_name, impo
 # Experimental => needs rewriting
 
 def validate(arguments):
-    loader = SpreadsheetLoader(arguments.spreadsheet, arguments.part_of_internal_study)
+    loader = SpreadsheetLoader(arguments.spreadsheet)
     sheet = loader.load()
-    result = validate_spreadsheet(sheet)
+    result = validate_spreadsheet(sheet, arguments.part_of_internal_study)
     if result:
         print(result)
     else:
@@ -46,5 +46,4 @@ if args.execute is not None:
 # TODO: validate preparation on real life example
 # TODO: rewrite experimental code
 # TODO: check it is running as the desired user.
-# TODO: move part_of_internal_study out of the loader, it's a pure validation issue
 # TODO: revisit the design of validation (either object or function composition)
