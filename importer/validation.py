@@ -1,14 +1,31 @@
 import re
-
 from collections import defaultdict
+from typing import List
+
+from importer.model import Spreadsheet, RawRead
 
 
-def validate_study_name(spreadsheet):
+def validate_spreadsheet(spreadsheet: Spreadsheet):
+    results = []
+    for v in [validate_study_name_length,
+              validate_study_name,
+              validate_external_data_part_of_internal_sequencing_study_name,
+              validate_mandatory_read_fields,
+              validate_files_are_compressed,
+              validate_pair_naming_convention,
+              validate_uniqueness_of_reads,
+              validate_no_path_in_filename,
+              ]:
+        results += v(spreadsheet)
+    return results
+
+
+def validate_study_name(spreadsheet: Spreadsheet) -> List[str]:
     invalid_chars = re.findall("[^\\w_\\d]", spreadsheet.name)
     return ["Invalid chars %s found in study name" % x for x in invalid_chars]
 
 
-def validate_external_data_part_of_internal_sequencing_study_name(spreadsheet):
+def validate_external_data_part_of_internal_sequencing_study_name(spreadsheet: Spreadsheet) -> List[str]:
     if not spreadsheet.part_of_internal_sequencing_study:
         return []
     name = re.findall("^\\d+_external$", spreadsheet.name)
@@ -17,8 +34,11 @@ def validate_external_data_part_of_internal_sequencing_study_name(spreadsheet):
     return ["Invalid name for data part of internal sequencing study %s" % spreadsheet.name]
 
 
-def validate_study_name_length(spreadsheet):
-    return [] if len(spreadsheet.name) <= 15 else ["Spreadsheet name longer than 15 chars"]
+def validate_study_name_length(spreadsheet: Spreadsheet) -> List[str]:
+    if spreadsheet.name.endswith('_external'):
+        validate = spreadsheet.name.replace('_external', '')
+        return [] if len(validate) <= 15 else ["Spreadsheet name excluding '_external' suffix is longer than 15 chars"]
+    return [] if len(spreadsheet.name) <= 15 else ["Spreadsheet name is longer than 15 chars"]
 
 
 def validate_mandatory_read_fields(spreadsheet):
@@ -26,7 +46,7 @@ def validate_mandatory_read_fields(spreadsheet):
     return [item for sublist in read_errors for item in sublist]
 
 
-def __validate_mandatory_read_fields_for_read(read):
+def __validate_mandatory_read_fields_for_read(read: RawRead) -> List[str]:
     result = []
     if read.forward_read is None:
         result.append("Missing forward_read for %s" % str(read))
@@ -39,12 +59,12 @@ def __validate_mandatory_read_fields_for_read(read):
     return result
 
 
-def validate_files_are_compressed(spreadsheet):
+def validate_files_are_compressed(spreadsheet: Spreadsheet) -> List[str]:
     read_errors = [__validate_files_are_compressed_for_read(read) for read in spreadsheet.reads]
     return [item for sublist in read_errors for item in sublist]
 
 
-def __validate_files_are_compressed_for_read(read):
+def __validate_files_are_compressed_for_read(read: RawRead) -> List[str]:
     result = []
     if not read.forward_read.endswith(".gz"):
         result.append("Forward read is not compressed with gz for %s" % str(read))
@@ -53,19 +73,19 @@ def __validate_files_are_compressed_for_read(read):
     return result
 
 
-def validate_pair_naming_convention(spreadsheet):
+def validate_pair_naming_convention(spreadsheet: Spreadsheet) -> List[str]:
     read_errors = [__validate_pair_naming_convention_for_read(read) for read in spreadsheet.reads]
     return [item for sublist in read_errors for item in sublist]
 
 
-def __validate_pair_naming_convention_for_read(read):
+def __validate_pair_naming_convention_for_read(read: RawRead) -> List[str]:
     result = []
     if read.reverse_read is not None and read.reverse_read.replace("_2.", "_1.") != read.forward_read:
         result.append("Inconsistent naming convention of forward and reverse reads for %s" % str(read))
     return result
 
 
-def validate_uniqueness_of_reads(spreadsheet):
+def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     forward_read = defaultdict(int)
     reverse_read = defaultdict(int)
     sample_name = defaultdict(int)
@@ -85,17 +105,15 @@ def validate_uniqueness_of_reads(spreadsheet):
     return invalid_forwad_read + invalid_reverse_read + invalid_sample_name + invalid_library_name;
 
 
-def validate_no_path_in_filename(spreadsheet):
+def validate_no_path_in_filename(spreadsheet: Spreadsheet) -> List[str]:
     read_errors = [__validate_no_path_in_filename_for_read(read) for read in spreadsheet.reads]
     return [item for sublist in read_errors for item in sublist]
 
 
-def __validate_no_path_in_filename_for_read(read):
+def __validate_no_path_in_filename_for_read(read: RawRead) -> List[str]:
     result = []
     if "/" in read.forward_read:
         result.append("Path present in filename: %s" % str(read.forward_read))
     if read.reverse_read is not None and "/" in read.reverse_read:
         result.append("Path present in filename: %s" % str(read.reverse_read))
     return result
-
-

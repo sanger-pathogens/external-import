@@ -6,40 +6,48 @@ from importer.validation import validate_study_name, validate_study_name_length,
     validate_no_path_in_filename, validate_external_data_part_of_internal_sequencing_study_name
 
 
-class TestValidation(unittest.TestCase):
+class TestStudyNameContent(unittest.TestCase):
 
     def test_study_name_with_valid_char_should_pass_validation(self):
         self.assertEqual([], validate_study_name(Spreadsheet("ValidName12345__")))
+
+    def test_study_name_with_invalid_char_should_fail_validation(self):
+        self.assertEqual(34, len(validate_study_name(Spreadsheet("!\"£$%^&*()+={}[]:@~;'#?/>.<,|\\`¬ \t"))))
+
+
+class TestStudyNameLength(unittest.TestCase):
+    def test_study_name_of_15_chars_or_less_are_valid(self):
+        self.assertEqual([], validate_study_name_length(Spreadsheet("123456789012345")))
+
+    def test_study_name_of_15_chars_or_less_without_external_suffix_are_valid(self):
+        self.assertEqual([], validate_study_name_length(Spreadsheet("123456789012345_external")))
+
+    def test_study_name_longer_than_15_characters_should_fail(self):
+        self.assertEqual(["Spreadsheet name is longer than 15 chars"],
+                         validate_study_name_length(Spreadsheet("1234567890123456")))
+
+    def test_study_name_longer_than_15_without_external_suffix_are_valid(self):
+        self.assertEqual(["Spreadsheet name excluding '_external' suffix is longer than 15 chars"],
+                         validate_study_name_length(Spreadsheet("1234567890123456_external")))
+
+
+class TestStudyNameWhenPartOfInternalSequencing(unittest.TestCase):
+
+    def test_external_data_not_check_on_normal_import(self):
+        self.assertEqual([], validate_external_data_part_of_internal_sequencing_study_name(Spreadsheet(
+            "ValidName12345__", [], False)))
 
     def test_invalid_name_for_external_data_part_of_internal_study(self):
         self.assertEqual(["Invalid name for data part of internal sequencing study ValidName12345__"],
                          validate_external_data_part_of_internal_sequencing_study_name(Spreadsheet("ValidName12345__",
                                                                                                    [], True)))
 
-    def test_external_data_not_check_on_normal_import(self):
-        self.assertEqual([], validate_external_data_part_of_internal_sequencing_study_name(Spreadsheet(
-            "ValidName12345__", [], False)))
-
     def test_valid_name_for_external_data_part_of_internal_study(self):
         self.assertEqual([], validate_external_data_part_of_internal_sequencing_study_name(Spreadsheet("345_external",
                                                                                                        [], True)))
 
-    def test_study_name_with_invalid_char_should_fail_validation(self):
-        self.assertEqual(34, len(validate_study_name(Spreadsheet("!\"£$%^&*()+={}[]:@~;'#?/>.<,|\\`¬ \t"))))
 
-    def test_study_name_of_15_chars_or_less_are_valid(self):
-        self.assertEqual([], validate_study_name_length(Spreadsheet("123456789012345")))
-
-    def test_study_name_with_invalid_char_should_fail_validation(self):
-        self.assertEqual(["Spreadsheet name longer than 15 chars"],
-                         validate_study_name_length(Spreadsheet("1234567890123456")))
-
-    def test_mandatory_fields_for_reads_are_populated(self):
-        self.assertEqual([],
-                         validate_mandatory_read_fields(
-                             Spreadsheet("1234567890123456",
-                                         [RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read='PAIR1_2.fastq.gz',
-                                                  sample_name='SAMPLE1', taxon_id="1280", library_name='LIB1')])))
+class TestValidateNoPathInFilename(unittest.TestCase):
 
     def test_no_path_in_filename(self):
         self.assertEqual([],
@@ -64,6 +72,8 @@ class TestValidation(unittest.TestCase):
                                                   reverse_read='/some/path/PAIR1_2.fastq.gz',
                                                   sample_name='SAMPLE1', taxon_id="1280", library_name='LIB1')])))
 
+
+class TestValidateUniquenessOfReads(unittest.TestCase):
     def test_uniqueness_of_files_sample_and_library(self):
         self.assertEqual([],
                          validate_uniqueness_of_reads(
@@ -118,18 +128,8 @@ class TestValidation(unittest.TestCase):
                                           RawRead(forward_read='PAIR2_1.fastq.gz', reverse_read=None,
                                                   sample_name='SAMPLE2', taxon_id="1280", library_name='LIB2')])))
 
-    def test_reads_are_not_compressed(self):
-        self.assertEqual(["Forward read is not compressed with gz for RawRead(forward_read='PAIR1_1.fastq', "
-                          "reverse_read='PAIR1_2.fastq', sample_name='SAMPLE1', taxon_id='1280', "
-                          "library_name='LIB1')",
-                          "Reverse read is not compressed with gz for RawRead(forward_read='PAIR1_1.fastq', "
-                          "reverse_read='PAIR1_2.fastq', sample_name='SAMPLE1', taxon_id='1280', "
-                          "library_name='LIB1')"],
-                         validate_files_are_compressed(
-                             Spreadsheet("1234567890123456",
-                                         [RawRead(forward_read='PAIR1_1.fastq', reverse_read='PAIR1_2.fastq',
-                                                  sample_name='SAMPLE1', taxon_id="1280", library_name='LIB1')])))
 
+class TestValidatePairReadsFileNamingConvention(unittest.TestCase):
     def test_pair_naming_convention_is_valid(self):
         self.assertEqual([],
                          validate_pair_naming_convention(
@@ -153,6 +153,21 @@ class TestValidation(unittest.TestCase):
                                          [RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read=None,
                                                   sample_name='SAMPLE1', taxon_id="1280", library_name='LIB1')])))
 
+
+class TestReadsAreCompressed(unittest.TestCase):
+
+    def test_reads_are_not_compressed(self):
+        self.assertEqual(["Forward read is not compressed with gz for RawRead(forward_read='PAIR1_1.fastq', "
+                          "reverse_read='PAIR1_2.fastq', sample_name='SAMPLE1', taxon_id='1280', "
+                          "library_name='LIB1')",
+                          "Reverse read is not compressed with gz for RawRead(forward_read='PAIR1_1.fastq', "
+                          "reverse_read='PAIR1_2.fastq', sample_name='SAMPLE1', taxon_id='1280', "
+                          "library_name='LIB1')"],
+                         validate_files_are_compressed(
+                             Spreadsheet("1234567890123456",
+                                         [RawRead(forward_read='PAIR1_1.fastq', reverse_read='PAIR1_2.fastq',
+                                                  sample_name='SAMPLE1', taxon_id="1280", library_name='LIB1')])))
+
     def test_reads_are_compressed(self):
         self.assertEqual([],
                          validate_files_are_compressed(
@@ -165,6 +180,15 @@ class TestValidation(unittest.TestCase):
                          validate_files_are_compressed(
                              Spreadsheet("1234567890123456",
                                          [RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read=None,
+                                                  sample_name='SAMPLE1', taxon_id="1280", library_name='LIB1')])))
+
+
+class TestMandatoryFieldsForReads(unittest.TestCase):
+    def test_mandatory_fields_for_reads_are_populated(self):
+        self.assertEqual([],
+                         validate_mandatory_read_fields(
+                             Spreadsheet("1234567890123456",
+                                         [RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read='PAIR1_2.fastq.gz',
                                                   sample_name='SAMPLE1', taxon_id="1280", library_name='LIB1')])))
 
     def test_mandatory_fields_for_reads_are_populated_single_read(self):

@@ -12,8 +12,10 @@ class TestLoader(unittest.TestCase):
         loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_upload.xls'))
 
         expected = Spreadsheet("MyStudy", [
-            RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read='PAIR1_2.fastq.gz', sample_name='SAMPLE1', taxon_id=1280.0, library_name='LIB1'),
-            RawRead(forward_read='PAIR2_1.fastq.gz', reverse_read='PAIR2_2.fastq.gz', sample_name='SAMPLE2', taxon_id=1280.0, library_name='LIB2')])
+            RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read='PAIR1_2.fastq.gz', sample_name='SAMPLE1',
+                    taxon_id='1280', library_name='LIB1'),
+            RawRead(forward_read='PAIR2_1.fastq.gz', reverse_read='PAIR2_2.fastq.gz', sample_name='SAMPLE2',
+                    taxon_id='1280', library_name='LIB2')])
         actual = loader.load()
         self.assertSpreadsheet(expected, actual)
 
@@ -21,9 +23,9 @@ class TestLoader(unittest.TestCase):
         loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_upload_no_pair.xls'))
 
         expected = Spreadsheet("MyStudy", [
-            RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read=None, sample_name='SAMPLE1', taxon_id=1280.0,
+            RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read=None, sample_name='SAMPLE1', taxon_id='1280',
                     library_name='LIB1'),
-            RawRead(forward_read='PAIR2_1.fastq.gz', reverse_read=None, sample_name='SAMPLE2', taxon_id=1280.0,
+            RawRead(forward_read='PAIR2_1.fastq.gz', reverse_read=None, sample_name='SAMPLE2', taxon_id='1280',
                     library_name='LIB2')])
         actual = loader.load()
         self.assertSpreadsheet(expected, actual)
@@ -32,9 +34,9 @@ class TestLoader(unittest.TestCase):
         loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_upload_no_pair_no_lib.xls'))
 
         expected = Spreadsheet("MyStudy", [
-            RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read=None, sample_name='SAMPLE1', taxon_id=1280.0,
+            RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read=None, sample_name='SAMPLE1', taxon_id='1280',
                     library_name='SAMPLE1'),
-            RawRead(forward_read='PAIR2_1.fastq.gz', reverse_read=None, sample_name='SAMPLE2', taxon_id=1280.0,
+            RawRead(forward_read='PAIR2_1.fastq.gz', reverse_read=None, sample_name='SAMPLE2', taxon_id='1280',
                     library_name='SAMPLE2')])
         actual = loader.load()
         self.assertSpreadsheet(expected, actual)

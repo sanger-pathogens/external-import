@@ -2,6 +2,7 @@ import re
 
 
 def print_pf_checks(spreadsheet):
+    print("Congratulations, the validation was successful, you now need to perform the below manual checks...:")
     __study_name_should_not_exists(spreadsheet)
     __sample_names_should_be_unique_across_the_database(spreadsheet)
     __lane_names_should_be_unique_across_the_database(spreadsheet)
