@@ -13,13 +13,13 @@ class TestArguments(unittest.TestCase):
 
     def test_should_parse_valid_arguments_to_validate_command(self):
         actual = self.under_test.parse(["validate", "-s", "test_upload.xls", "-i"])
-        expected = argparse.Namespace(execute=self.validation_function, spreadsheet="test_upload.xls", ticket=123,
+        expected = argparse.Namespace(execute=self.validation_function, spreadsheet="test_upload.xls",
                                       part_of_internal_study=True)
         self.assertEquals(actual, expected)
 
     def test_should_parse_when_not_part_of_internal_study(self):
         actual = self.under_test.parse(["validate", "-s", "test_upload.xls"])
-        expected = argparse.Namespace(execute=self.validation_function, spreadsheet="test_upload.xls", ticket=123,
+        expected = argparse.Namespace(execute=self.validation_function, spreadsheet="test_upload.xls",
                                       part_of_internal_study=False)
         self.assertEquals(actual, expected)
 

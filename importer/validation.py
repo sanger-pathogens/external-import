@@ -7,16 +7,16 @@ from importer.model import Spreadsheet, RawRead
 
 def validate_spreadsheet(spreadsheet: Spreadsheet):
     results = []
-    for v in [validate_study_name_length,
-              validate_study_name,
-              validate_external_data_part_of_internal_sequencing_study_name,
-              validate_mandatory_read_fields,
-              validate_files_are_compressed,
-              validate_pair_naming_convention,
-              validate_uniqueness_of_reads,
-              validate_no_path_in_filename,
-              ]:
-        results += v(spreadsheet)
+    for validator in [validate_study_name_length,
+                      validate_study_name,
+                      validate_external_data_part_of_internal_sequencing_study_name,
+                      validate_mandatory_read_fields,
+                      validate_files_are_compressed,
+                      validate_pair_naming_convention,
+                      validate_uniqueness_of_reads,
+                      validate_no_path_in_filename,
+                      ]:
+        results += validator(spreadsheet)
     return results
 
 
