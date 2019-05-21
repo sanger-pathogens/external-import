@@ -40,7 +40,8 @@ def import_(arguments):
 
 parser = ArgumentParser(validate, prepare, import_)
 args = parser.parse(argv[1:])
-args.execute(args)
+if args.execute is not None:
+    args.execute(args)
 
 # TODO: validate preparation on real life example
 # TODO: rewrite experimental code

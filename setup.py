@@ -1,7 +1,7 @@
 import glob
 import os
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 def read(fname):
@@ -12,12 +12,13 @@ version = 'x.y.z'
 if os.path.exists('VERSION'):
     version = open('VERSION').read().strip()
 
+
 setup(
     name='external-import',
     version=version,
     description='Parse spreadsheets of external import',
     long_description=read('README.md'),
-    packages=find_packages(),
+    packages=['importer'],
     author='Olivier Seret',
     author_email='path-help@sanger.ac.uk',
     url='https://github.com/sanger-pathogens/external-import',
