@@ -25,8 +25,71 @@ class TestValidateCommandArguments(unittest.TestCase):
 
     def test_spreadsheet_is_mandatory(self):
         actual = self.under_test.parse(["validate", "-i", "-o", "output"])
-        self.assertEqual(actual, None)
+        self.assertIsNone(actual)
 
     def test_output_is_mandatory(self):
         actual = self.under_test.parse(["validate", "-s", "test_upload.xls", "-i"])
-        self.assertEqual(actual, None)
+        self.assertIsNone(actual)
+
+
+class TestPrepareCommandArguments(unittest.TestCase):
+
+    def setUp(self):
+        self.preparation_function = Mock()
+        self.under_test = ArgumentParser(prepare=self.preparation_function)
+
+    def test_should_parse_valid_arguments(self):
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123"])
+        expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
+                                      spreadsheet="test_upload.xls", ticket=123)
+        self.assertEqual(actual, expected)
+
+    def test_spreadsheet_is_mandatory(self):
+        actual = self.under_test.parse(["prepare", "-i", "input", "-o", "output", "-t", "123"])
+        self.assertIsNone(actual)
+
+    def test_input_is_mandatory(self):
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-o", "output", "-t", "123"])
+        self.assertIsNone(actual)
+
+    def test_output_is_mandatory(self):
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-t", "123"])
+        self.assertIsNone(actual)
+
+    def test_ticket_is_mandatory(self):
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output"])
+        self.assertIsNone(actual)
+
+    def test_ticket_is_a_number(self):
+        actual = self.under_test.parse(
+            ["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "invalid_ticket"])
+        self.assertIsNone(actual)
+
+
+class TestImportCommandArguments(unittest.TestCase):
+
+    def setUp(self):
+        self.import_function = Mock()
+        self.under_test = ArgumentParser(load=self.import_function)
+
+    def test_should_parse_valid_arguments(self):
+        actual = self.under_test.parse(["load", "-d", "a_database", "-o", "output", "-t", "123"])
+        expected = argparse.Namespace(output='output', database='a_database', execute=self.import_function,
+                                      ticket=123)
+        self.assertEqual(actual, expected)
+
+    def test_database_is_mandatory(self):
+        actual = self.under_test.parse(["load", "-o", "output", "-t", "123"])
+        self.assertIsNone(actual)
+
+    def test_output_is_mandatory(self):
+        actual = self.under_test.parse(["load", "-d", "a_database", "-t", "123"])
+        self.assertIsNone(actual)
+
+    def test_ticket_is_mandatory(self):
+        actual = self.under_test.parse(["load", "-d", "a_database", "-o", "output"])
+        self.assertIsNone(actual)
+
+    def test_ticket_is_a_number(self):
+        actual = self.under_test.parse(["load", "-d", "a_database", "-o", "output", "-t", "invalid_ticket"])
+        self.assertIsNone(actual)

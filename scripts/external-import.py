@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 
-from os import mkdir
+import argparse
 from sys import argv
 
 from importer.argument_parser import ArgumentParser
+from importer.importer import DataImporter
 from importer.loader import SpreadsheetLoader
 from importer.pfchecks import print_pf_checks
 from importer.validation import validate_spreadsheet
-from importer.writer import save, output_dir, copy_files, spreadsheet_name, import_cmd
+from importer.writer import Preparation, \
+    OutputSpreadsheetGenerator
 
 
-# Experimental => needs rewriting
-
-def validate(arguments):
+def validate(arguments: argparse.Namespace):
     loader = SpreadsheetLoader(arguments.spreadsheet)
     sheet = loader.load()
     result = validate_spreadsheet(sheet, arguments.part_of_internal_study)
@@ -22,28 +22,26 @@ def validate(arguments):
         print_pf_checks(sheet, arguments.output)
 
 
-def prepare(arguments):
+def prepare(arguments: argparse.Namespace):
     loader = SpreadsheetLoader(arguments.spreadsheet)
     sheet = loader.load()
-    destination = output_dir(arguments.output, arguments.ticket)
-    mkdir(destination)
-    sheet_name = spreadsheet_name(destination, arguments.ticket)
-    save(sheet, sheet_name)
-    copy_files(sheet, arguments.input, destination)
+    generator = OutputSpreadsheetGenerator(sheet)
+    workbook = generator.build()
+    preparation = Preparation.new_instance(sheet, arguments.output, arguments.ticket)
+    preparation.create_destination_directory()
+    preparation.copy_files(arguments.input)
+    preparation.save_workbook(workbook)
 
 
-def import_(arguments):
-    destination = output_dir(arguments.output, arguments.ticket)
-    sheet_name = spreadsheet_name(destination, arguments.ticket)
-    import_cmd(args.database, destination, sheet_name)
+def load(arguments: argparse.Namespace):
+    importer = DataImporter.new_instance(arguments.output, arguments.ticket, arguments.database)
+    importer.load()
 
 
-parser = ArgumentParser(validate, prepare, import_)
+parser = ArgumentParser(validate, prepare, load)
 args = parser.parse(argv[1:])
-if args.execute is not None:
+if args is not None and args.execute is not None:
     args.execute(args)
 
-# TODO: validate preparation on real life example
-# TODO: rewrite experimental code
 # TODO: check it is running as the desired user.
 # TODO: revisit the design of validation (either object or function composition)
