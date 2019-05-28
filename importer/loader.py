@@ -11,12 +11,28 @@ class SpreadsheetLoader:
         self._sheet = self._workbook.sheet_by_index(0)
 
     def load(self):
+        result = Spreadsheet()
         data_row = 0
         header_row = 0
-        study = ""
         for i in range(self._sheet.nrows):
             if self._sheet.cell_value(i, 0) == 'Study Name':
-                study = self._sheet.cell_value(i, 1)
+                result.name = self._sheet.cell_value(i, 1)
+            if self._sheet.cell_value(i, 0) == 'Supplier Name':
+                result.supplier = self._sheet.cell_value(i, 1)
+            if self._sheet.cell_value(i, 0) == 'Supplier Organisation':
+                result.organisation = self._sheet.cell_value(i, 1)
+            if self._sheet.cell_value(i, 0) == 'Sanger Contact Name':
+                result.contact = self._sheet.cell_value(i, 1)
+            if self._sheet.cell_value(i, 0) == 'Sequencing Technology':
+                result.technology = self._sheet.cell_value(i, 1)
+            if self._sheet.cell_value(i, 0) == 'Study Accession number':
+                result.accession = self.__extract_text_value(i, 1)
+            if self._sheet.cell_value(i, 0) == 'Total size of files in GBytes':
+                result.size = self._sheet.cell_value(i, 1)
+            if self._sheet.cell_value(i, 0) == 'Data to be kept until':
+                year, month, day, hour, minute, second = xlrd.xldate_as_tuple(self._sheet.cell_value(i, 1),
+                                                                              self._workbook.datemode)
+                result.limit = "%02d/%02d/%04d" % (day, month, year)
             if self._sheet.cell_value(i, 0) == 'Filename':
                 data_row = i + 1
                 header_row = i
@@ -29,6 +45,8 @@ class SpreadsheetLoader:
                 mate_filename_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Name':
                 sample_name_column = i
+            if self._sheet.cell_value(header_row, i) == 'Sample Accession number':
+                sample_accession_column = i
             if self._sheet.cell_value(header_row, i) == 'Taxon ID':
                 taxon_id_column = i
             if self._sheet.cell_value(header_row, i) == 'Library Name':
@@ -43,10 +61,11 @@ class SpreadsheetLoader:
                 self.__extract_text_value(i, filename_column),
                 self.__extract_text_value(i, mate_filename_column),
                 sample_name,
+                self.__extract_text_value(i, sample_accession_column),
                 self.__extract_float_value(i, taxon_id_column),
                 library_name))
-
-        return Spreadsheet.new_instance(study, reads)
+        result.reads = reads
+        return result
 
     def __extract_text_value(self, row, column):
         new_data = self._sheet.cell_value(row, column).strip()

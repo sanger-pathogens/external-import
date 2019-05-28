@@ -45,14 +45,15 @@ class OutputSpreadsheetGenerator:
         return self.workbook
 
     def build_import_info(self):
-        self.not_applicable(0, 'Supplier Name')
-        self.not_applicable(1, 'Supplier Organisation')
-        self.not_applicable(2, 'Sanger Contact Name')
-        self.not_applicable(3, 'Sequencing Technology')
+
+        self.write_string(0, 'Supplier Name', self.spreadsheet.supplier)
+        self.write_string(1, 'Supplier Organisation', self.spreadsheet.organisation)
+        self.write_string(2, 'Sanger Contact Name', self.spreadsheet.contact)
+        self.write_string(3, 'Sequencing Technology', self.spreadsheet.technology)
         self.write_string(4, 'Study Name', self.spreadsheet.name)
-        self.not_applicable(5, 'Study Accession number')
-        self.not_applicable(6, 'Total size of files in GBytes')
-        self.not_applicable(7, 'Data to be kept until')
+        self.write_string(5, 'Study Accession number', self.spreadsheet.accession)
+        self.write_string(6, 'Total size of files in GBytes', self.spreadsheet.size)
+        self.write_string(7, 'Data to be kept until', self.spreadsheet.limit)
 
     def build_read_data(self):
         row = 10
