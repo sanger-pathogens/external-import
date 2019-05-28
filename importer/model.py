@@ -5,6 +5,9 @@ RawRead = namedtuple('RawRead', 'forward_read, reverse_read, sample_name, taxon_
 
 class Spreadsheet:
 
-    def __init__(self, name, reads=[]):
-        self.name = name
-        self.reads = reads
+    @staticmethod
+    def new_instance(name, reads=[]):
+        result = Spreadsheet()
+        result.name = name
+        result.reads = reads
+        return result

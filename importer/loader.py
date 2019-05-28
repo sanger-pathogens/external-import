@@ -46,7 +46,7 @@ class SpreadsheetLoader:
                 self.__extract_float_value(i, taxon_id_column),
                 library_name))
 
-        return Spreadsheet(study, reads)
+        return Spreadsheet.new_instance(study, reads)
 
     def __extract_text_value(self, row, column):
         new_data = self._sheet.cell_value(row, column).strip()
