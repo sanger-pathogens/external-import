@@ -56,10 +56,25 @@ class TestLoader(unittest.TestCase):
         actual = loader.load()
         self.assertSpreadsheet(expected, actual)
 
+    def test_sample_and_library_names_as_integers(self):
+        loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_sample_name_as_int.xls'))
+
+        expected = Spreadsheet.new_instance("AStudyName1", [
+            self._raw_read('ERR0000001_1.fastq.gz', 'ERR0000001_2.fastq.gz', '101260', '1000000001', 'ERR0000001',
+                           '485'),
+            self._raw_read('ERR0000002_1.fastq.gz', 'ERR0000002_2.fastq.gz', '101264', '2000000002', 'ERR0000002',
+                           '485')],
+                                            contact="Me", organisation="Org", supplier='Supplier',
+                                            technology='Illumina', size=1.90, accession=None,
+                                            limit='01/01/2025')
+        actual = loader.load()
+        self.assertSpreadsheet(expected, actual)
+
+
     def assertSpreadsheet(self, expected, actual):
         self.maxDiff = None
         self.assertEqual(expected.__dict__, actual.__dict__)
 
-    def _raw_read(self, forward_read, reverse_read, sample_name, library_name, accession):
+    def _raw_read(self, forward_read, reverse_read, sample_name, library_name, accession, taxon_id='1280'):
         return RawRead(forward_read=forward_read, reverse_read=reverse_read, sample_name=sample_name,
-                       sample_accession=accession, taxon_id='1280', library_name=library_name)
+                       sample_accession=accession, taxon_id=taxon_id, library_name=library_name)
