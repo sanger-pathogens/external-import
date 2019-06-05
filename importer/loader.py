@@ -53,8 +53,8 @@ class SpreadsheetLoader:
                 library_name_column = i
         reads = []
         for i in range(data_row, self._sheet.nrows):
-            sample_name = self.__extract_text_value(i, sample_name_column)
-            library_name = self.__extract_text_value(i, library_name_column)
+            sample_name = self.__extract_float_value(i, sample_name_column)
+            library_name = self.__extract_float_value(i, library_name_column)
             if library_name is None:
                 library_name = sample_name
             reads.append(RawRead(
