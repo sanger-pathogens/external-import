@@ -36,7 +36,7 @@ A python3 library to parse external import spreadsheets
 
 ## Introduction
 Provide a more in-depth overview and description of the software. A single paragraph should be sufficient.
-
+-->
 ## Installation
 ```
 virtualenv --system-site-packages external_import
@@ -130,7 +130,7 @@ optional arguments:
   -o OUTPUT, --output OUTPUT
                         Base directory for import data
 ```
-
+<!--
 ## License
 <software name> is free software, licensed under [<license>](link_to_license_file_on_github).
 
