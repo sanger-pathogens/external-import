@@ -2,11 +2,12 @@ import xlrd
 
 class Spreadsheet_Splitter:
 
-    def __init__(self, spreadsheet, ticket, read_length=150, directory='.'):
+    def __init__(self, output, ticket, read_length=150):
         ''' Runs full script for separating the spreadsheet to correct sizes '''
+        spreadsheet = f'{output}/{ticket}/external_{ticket}.xls'
         self.header = Spreadsheet_Splitter.header_getter(self, spreadsheet)
         self.split_sequences = Spreadsheet_Splitter.part_builder(self, spreadsheet, read_length)
-        Spreadsheet_Splitter.build_sequences(self, ticket, directory)
+        Spreadsheet_Splitter.build_sequences(self, ticket, output)
 
     def header_getter(self, spreadsheet):
         '''Takes the header from the spreadsheet given and stores it'''
@@ -49,6 +50,6 @@ class Spreadsheet_Splitter:
         ''' Uses header and list to build new files '''
         for seq_strip in range(len(self.split_sequences)):
             log = self.header + self.split_sequences[seq_strip]
-            written_file = open('{}/external_{}_{}.xls'.format(directory, ticket, seq_strip), 'w')
+            written_file = open('{}/{}/external_{}_{}.xls'.format(directory, ticket, ticket, seq_strip), 'w')
             written_file.write(log)
             written_file.close()

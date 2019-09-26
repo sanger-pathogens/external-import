@@ -5,18 +5,18 @@ from importer import file_splitter as fs
 class file_split_tester(unittest.TestCase):
 
     def setUp(self):
-        self.datasheet1 = fs.Spreadsheet_Splitter('breakpoint_testing/data_chuck_1.xls', 12345, 1, './breakpoint_testing')
-        self.datasheet2 = fs.Spreadsheet_Splitter('breakpoint_testing/data_chuck_2.xls', 23456, 3, './breakpoint_testing')
+        self.datasheet1 = fs.Spreadsheet_Splitter('breakpoint_testing', 12345, 1)
+        self.datasheet2 = fs.Spreadsheet_Splitter('breakpoint_testing', 23456, 3)
 
     def tearDown(self):
-        if os.path.isfile('breakpoint_testing/external_12345_0.xls') == True:
-            os.remove('breakpoint_testing/external_12345_0.xls')
-        if os.path.isfile('breakpoint_testing/external_12345_1.xls') == True:
-            os.remove('breakpoint_testing/external_12345_1.xls')
-        if os.path.isfile('breakpoint_testing/external_23456_0.xls') == True:
-            os.remove('breakpoint_testing/external_23456_0.xls')
-        if os.path.isfile('breakpoint_testing/external_23456_1.xls') == True:
-            os.remove('breakpoint_testing/external_23456_1.xls')
+        if os.path.isfile('breakpoint_testing/12345/external_12345_0.xls') == True:
+            os.remove('breakpoint_testing/12345/external_12345_0.xls')
+        if os.path.isfile('breakpoint_testing/12345/external_12345_1.xls') == True:
+            os.remove('breakpoint_testing/12345/external_12345_1.xls')
+        if os.path.isfile('breakpoint_testing/23456/external_23456_0.xls') == True:
+            os.remove('breakpoint_testing/23456/external_23456_0.xls')
+        if os.path.isfile('breakpoint_testing/23456/external_23456_1.xls') == True:
+            os.remove('breakpoint_testing/23456/external_23456_1.xls')
 
     def test_header(self):
         test = open('./breakpoint_testing/header_test_1.txt')
@@ -38,45 +38,45 @@ class file_split_tester(unittest.TestCase):
 
     def test_built_sequence(self):
     # runs through presence and contents checks for each file, then deletes the presence checked file to ensure validation
-        if os.path.isfile('./breakpoint_testing/external_12345_0.xls') == True:
+        if os.path.isfile('./breakpoint_testing/12345/external_12345_0.xls') == True:
             tester_file = open('./breakpoint_testing/test_external_12345_0.xls')
-            forged_file = open('./breakpoint_testing/external_12345_0.xls')
+            forged_file = open('./breakpoint_testing/12345/external_12345_0.xls')
             self.assertEqual(forged_file.read(),
                              tester_file.read())
             forged_file.close()
             tester_file.close()
         else:
-            self.assertTrue(os.path.isfile('./breakpoint_testing/external_12345_0.xls'))
+            self.assertTrue(os.path.isfile('./breakpoint_testing/12345/external_12345_0.xls'))
 
-        if os.path.isfile('./breakpoint_testing/external_12345_1.xls') == True:
+        if os.path.isfile('./breakpoint_testing/12345/external_12345_1.xls') == True:
             tester_file = open('./breakpoint_testing/test_external_12345_1.xls')
-            forged_file = open('./breakpoint_testing/external_12345_1.xls')
+            forged_file = open('./breakpoint_testing/12345/external_12345_1.xls')
             self.assertEqual(forged_file.read(),
                              tester_file.read())
             forged_file.close()
             tester_file.close()
         else:
-            self.assertTrue(os.path.isfile('./breakpoint_testing/external_12345_1.xls'))
+            self.assertTrue(os.path.isfile('./breakpoint_testing/12345/external_12345_1.xls'))
 
-        if os.path.isfile('./breakpoint_testing/external_23456_0.xls') == True:
+        if os.path.isfile('./breakpoint_testing/23456/external_23456_0.xls') == True:
             tester_file = open('./breakpoint_testing/test_external_23456_0.xls')
-            forged_file = open('./breakpoint_testing/external_23456_0.xls')
+            forged_file = open('./breakpoint_testing/23456/external_23456_0.xls')
             self.assertEqual(forged_file.read(),
                              tester_file.read())
             forged_file.close()
             tester_file.close()
         else:
-            self.assertTrue(os.path.isfile('./breakpoint_testing/external_23456_0.xls'))
+            self.assertTrue(os.path.isfile('./breakpoint_testing/23456/external_23456_0.xls'))
 
-        if os.path.isfile('./breakpoint_testing/external_23456_1.xls') == True:
+        if os.path.isfile('./breakpoint_testing/23456/external_23456_1.xls') == True:
             tester_file = open('./breakpoint_testing/test_external_23456_1.xls')
-            forged_file = open('./breakpoint_testing/external_23456_1.xls')
+            forged_file = open('./breakpoint_testing/23456/external_23456_1.xls')
             self.assertEqual(forged_file.read(),
                              tester_file.read())
             forged_file.close()
             tester_file.close()
         else:
-            self.assertTrue(os.path.isfile('./breakpoint_testing/external_23456_1.xls'))
+            self.assertTrue(os.path.isfile('./breakpoint_testing/23456/external_23456_1.xls'))
 
 
 
