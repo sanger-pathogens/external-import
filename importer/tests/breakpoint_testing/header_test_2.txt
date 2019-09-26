@@ -1,0 +1,10 @@
+Supplier Name	Neil MacAlasdair	 
+Supplier Organisation	Sanger	 
+Sanger Contact Name	Neil MacAlasdair	 
+Sequencing Technology	Illumina	 
+Study Name	Neiseria_gbl_db	 
+Study Accession number	 
+Total size of files in GBytes	1800.0	 
+Data to be kept until	9/1/2039	 
+ 
+Filename	Mate File	Sample Name	Sample Accession number	Taxon ID	Library Name	Fragment Size	Read Count	Base Count	Comments	 

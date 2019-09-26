@@ -3,6 +3,7 @@
 import argparse
 from sys import argv
 
+import file_splitter
 from importer.argument_parser import ArgumentParser
 from importer.importer import DataImporter
 from importer.loader import SpreadsheetLoader
@@ -31,7 +32,8 @@ def prepare(arguments: argparse.Namespace):
     preparation.create_destination_directory()
     preparation.copy_files(arguments.input)
     preparation.save_workbook(workbook)
-
+    file_splitter.Spreadsheet_Splitter(preparation.sheet, arguments.ticket, arguments.breakpoint,
+                                       preparation.destination)
 
 def load(arguments: argparse.Namespace):
     importer = DataImporter.new_instance(arguments.output, arguments.ticket, arguments.database)
