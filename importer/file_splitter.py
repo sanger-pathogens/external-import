@@ -1,4 +1,5 @@
 import xlrd
+import os
 
 class Spreadsheet_Splitter:
 
@@ -8,6 +9,7 @@ class Spreadsheet_Splitter:
         self.header = Spreadsheet_Splitter.header_getter(self, spreadsheet)
         self.split_sequences = Spreadsheet_Splitter.part_builder(self, spreadsheet, read_length)
         Spreadsheet_Splitter.build_sequences(self, ticket, output)
+
 
     def header_getter(self, spreadsheet):
         '''Takes the header from the spreadsheet given and stores it'''
