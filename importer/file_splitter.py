@@ -17,7 +17,7 @@ class Spreadsheet_Splitter:
         for i in range(10):
             for col in range(sheet.ncols):
                 if sheet.cell_type(i, col) not in (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK):
-                    if sheet.cell_value(i, 0) == 'Data to be kept until':
+                    if sheet.cell_value(i, 0) == 'Data to be kept until' and isinstance(sheet.cell_value(i, 1), float) == True :
                         year, month, day, *rest = xlrd.xldate_as_tuple(sheet.cell_value(i, 1), head_set.datemode)
                         header = header + str(sheet.cell_value(i, 0)) + '\t' + (f'{day}/{month}/{year}\t')
                         i += 1
