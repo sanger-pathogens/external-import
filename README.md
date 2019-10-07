@@ -39,7 +39,7 @@ Provide a more in-depth overview and description of the software. A single parag
 -->
 ## Installation
 ```
-virtualenv --system-site-packages external_import
+python3 -m venv external_import
 source external_import/bin/activate
 git clone https://github.com/sanger-pathogens/external-import
 cd external-import
