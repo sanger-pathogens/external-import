@@ -39,9 +39,10 @@ class TestPrepareCommandArguments(unittest.TestCase):
         self.under_test = ArgumentParser(prepare=self.preparation_function)
 
     def test_should_parse_valid_arguments(self):
-        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123"])
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123",
+                                        "-b", "456"])
         expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123)
+                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=456)
         self.assertEqual(actual, expected)
 
     def test_spreadsheet_is_mandatory(self):
@@ -64,6 +65,17 @@ class TestPrepareCommandArguments(unittest.TestCase):
         actual = self.under_test.parse(
             ["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "invalid_ticket"])
         self.assertIsNone(actual)
+
+    def test_breakpoint_is_a_number(self):
+        actual = self.under_test.parse(
+            ["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-b", "invalid_break"])
+        self.assertIsNone(actual)
+
+    def test_breakpoint_defaults_to_150(self):
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123"])
+        expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
+                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=150)
+        self.assertEqual(actual, expected)
 
 
 class TestImportCommandArguments(unittest.TestCase):

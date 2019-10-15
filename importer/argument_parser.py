@@ -35,7 +35,8 @@ class ArgumentParser:
         preparation_parser.add_argument('-t', '--ticket', type=int, required=True, help='RT Ticket number')
         preparation_parser.add_argument('-i', '--input', required=True, help='Directory containing the read files')
         preparation_parser.add_argument('-o', '--output', required=True, help='Base directory for import datas')
-        preparation_parser.add_argument('-b', '--breakpoint', type=int, required=False, help='Breakpoint to split spreadsheet')
+        preparation_parser.add_argument('-b', '--breakpoint', type=int, required=False, default=150,
+                                        help='Breakpoint to split spreadsheet, default is 150 lines')
         preparation_parser.set_defaults(execute=self.preparation_function)
 
     def _build_validation_sub_parser(self, validation_parser):
