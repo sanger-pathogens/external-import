@@ -3,8 +3,7 @@ from unittest.mock import patch, call
 import os
 import xlrd
 from importer.model import Spreadsheet, RawRead
-from importer.writer import Preparation
-from importer.writer import OutputSpreadsheetGenerator
+from importer.writer import Preparation, OutputSpreadsheetGenerator
 
 AN_OUTPUT = "AN_OUTPUT"
 A_TICKET = 123

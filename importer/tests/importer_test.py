@@ -1,8 +1,7 @@
 import unittest
 import os
-import glob
 from importer.importer import DataImporter
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 OUTPUT = 'base'
 TICKET = 123
