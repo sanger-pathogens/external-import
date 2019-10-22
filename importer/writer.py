@@ -1,6 +1,7 @@
 from os import mkdir, path
 from shutil import copyfile
 
+import sys
 import xlwt
 
 from importer.model import Spreadsheet
@@ -12,9 +13,7 @@ class Preparation:
     @staticmethod
     def new_instance(spreadsheet: Spreadsheet, base: str, ticket: int, instance: int):
         destination = "%s/%d" % (base, ticket)
-        base_instance = instance
-        instance += 1
-        return Preparation(spreadsheet, destination, '%s/external_%d_%d.xls' % (destination, ticket, base_instance)), instance
+        return Preparation(spreadsheet, destination, '%s/external_%d_%d.xls' % (destination, ticket, instance))
 
     def __init__(self, spreadsheet: Spreadsheet, destination: str, spreadsheet_file: str):
         self.spreadsheet = spreadsheet
@@ -34,7 +33,6 @@ class Preparation:
         if path.isdir(self.destination) == False:
             mkdir(self.destination)
 
-
 class OutputSpreadsheetGenerator:
 
     def __init__(self, spreadsheet: Spreadsheet, current_position: int):
@@ -47,7 +45,7 @@ class OutputSpreadsheetGenerator:
     def build(self, breakpoint: int):
         self.build_import_info()
         self.build_read_headers()
-        self.build_read_data(breakpoint)
+        self.build_read_data(breakpoint if breakpoint > 0 else sys.maxsize)
         return self.workbook, self.status_closed, self.row
 
     def build_import_info(self):
@@ -64,15 +62,17 @@ class OutputSpreadsheetGenerator:
     def build_read_data(self, breakpoint: int):
         for read in range(breakpoint):
             position = read + 10
-            if self.row == len(self.spreadsheet.reads):
+            end_reached = self.row == len(self.spreadsheet.reads)
+            if end_reached:
                 self.status_closed = True
                 break
-            self.sheet.write(position, 0, self.spreadsheet.reads[self.row].forward_read)
-            if self.spreadsheet.reads[self.row].reverse_read is not None:
-                self.sheet.write(position, 1, self.spreadsheet.reads[self.row].reverse_read)
-            self.sheet.write(position, 2, self.spreadsheet.reads[self.row].sample_name)
-            self.sheet.write(position, 4, self.spreadsheet.reads[self.row].taxon_id)
-            self.sheet.write(position, 5, self.spreadsheet.reads[self.row].library_name)
+            current_row = self.spreadsheet.reads[self.row]
+            self.sheet.write(position, 0, current_row.forward_read)
+            if current_row.reverse_read is not None:
+                self.sheet.write(position, 1, current_row.reverse_read)
+            self.sheet.write(position, 2, current_row.sample_name)
+            self.sheet.write(position, 4, current_row.taxon_id)
+            self.sheet.write(position, 5, current_row.library_name)
             self.row += 1
         if self.row == len(self.spreadsheet.reads):
             self.status_closed = True

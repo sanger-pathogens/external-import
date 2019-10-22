@@ -33,15 +33,16 @@ def prepare(arguments: argparse.Namespace):
     while file_ended == False:
         generator = OutputSpreadsheetGenerator(sheet, current_position)
         workbook, file_ended, current_position = generator.build(arguments.breakpoint)
-        preparation, instance = Preparation.new_instance(sheet, arguments.output, arguments.ticket, instance)
+        preparation = Preparation.new_instance(sheet, arguments.output, arguments.ticket, instance)
         preparation.create_destination_directory()
         preparation.save_workbook(workbook)
+        instance += 1
     preparation.copy_files(arguments.input)
 
 
 def load(arguments: argparse.Namespace):
     importer = DataImporter.new_instance(arguments.output, arguments.ticket, arguments.database)
-    importer.load()
+    DataImporter.load(importer, arguments.commands)
 
 
 parser = ArgumentParser(validate, prepare, load)
