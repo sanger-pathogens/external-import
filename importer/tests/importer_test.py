@@ -1,5 +1,7 @@
 import unittest
 import os
+import glob
+from tempfile import NamedTemporaryFile
 from importer.importer import DataImporter
 from unittest.mock import patch
 
@@ -20,6 +22,14 @@ def glob_replacer(ticket_string, recursive):
         GLOB_LIST = ['one', 'two']
         return GLOB_LIST
 
+# def temp_file(name, condition):
+#     *direct, filename = name.split('/')
+#     direction = '/'.join(direct)
+#     pref, suf = filename.split('.')
+#     open_file = NamedTemporaryFile(mode=condition, dir=direction, prefix=pref, suffix=suf, delete=False)
+#     return open_file
+
+
 class importerTesting(unittest.TestCase):
 
     def test_importer_setup(self):
@@ -34,36 +44,48 @@ class importerTesting(unittest.TestCase):
 
 
     def test_importer_printout(self):
+        # with patch('builtins.open', side_effect=temp_file):
         TESTER_LINES = ['\n',
-                        '        Execute the below to import:\n',
-                        '\n',
-                        'cd /software/pathogen/projects/update_pipeline\n',
-                        '\n',
-                        f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}_0.log -e {OUTPUT}/{TICKET}/external_{TICKET}_0.err -M2000 \\\n',
-                        '''  -R "select[mem>2000] rusage[mem=2000]" './bin/update_pipeline_from_spreadsheet.pl \\\n''',
-                        f'  -d {DATABASE} \\\n',
-                        f'  -f {OUTPUT}/{TICKET} \\\n',
-                        f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
-                        f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xls'\n",
-                        '\n',
-                        '\n',
-                        f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}_1.log -e {OUTPUT}/{TICKET}/external_{TICKET}_1.err -M2000 \\\n',
-                        '''  -R "select[mem>2000] rusage[mem=2000]" './bin/update_pipeline_from_spreadsheet.pl \\\n''',
-                        f'  -d {DATABASE} \\\n',
-                        f'  -f {OUTPUT}/{TICKET} \\\n',
-                        f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
-                        f"  {OUTPUT}/{TICKET}/external_{TICKET}_1.xls'\n",
-                        '\n',
-                        '\n',
-                        'Then following the external data import SOP to register the study\n',
-                        '\n']
+            '        Execute the below to import:\n',
+            '\n',
+            'cd /software/pathogen/projects/update_pipeline\n',
+            '\n',
+            f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}_0.log -e {OUTPUT}/{TICKET}/external_{TICKET}_0.err -M2000 \\\n',
+            '''  -R "select[mem>2000] rusage[mem=2000]" './bin/update_pipeline_from_spreadsheet.pl \\\n''',
+            f'  -d {DATABASE} \\\n',
+            f'  -f {OUTPUT}/{TICKET} \\\n',
+            f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
+            f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xls'\n",
+            '\n',
+            '\n',
+            f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}_1.log -e {OUTPUT}/{TICKET}/external_{TICKET}_1.err -M2000 \\\n',
+            '''  -R "select[mem>2000] rusage[mem=2000]" './bin/update_pipeline_from_spreadsheet.pl \\\n''',
+            f'  -d {DATABASE} \\\n',
+            f'  -f {OUTPUT}/{TICKET} \\\n',
+            f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
+            f"  {OUTPUT}/{TICKET}/external_{TICKET}_1.xls'\n",
+            '\n',
+            '\n',
+            'Then following the external data import SOP to register the study\n',
+            '\n']
 
         DataImporter.load(COMMANDS, COMMAND_FILE_NAME)
 
-        if os.path.isfile(f'{COMMAND_FILE_NAME}/command_file.txt'):
-            TESTED_FILE = open(f'{COMMAND_FILE_NAME}/command_file.txt','r')
+        # COMMAND_FILE = glob.glob(f'{COMMAND_FILE_NAME}/command_file*txt')
+        # if len(COMMAND_FILE) > 1:
+        #     for command in COMMAND_FILE:
+        #         os.remove(command)
+        #     self.fail('Multiple existing command files')
+        # elif len(COMMAND_FILE) < 1:
+        #     self.fail('Command file failed to create in correct location')
+        # else:
+        #     TESTED_FILE = open(COMMAND_FILE[0])
+        #     for index, LINE in enumerate(TESTED_FILE):
+        #         self.assertEqual(LINE, TESTER_LINES[index])
+        #     TESTED_FILE.close()
+        if os.path.isfile(f'/tmp/command_file.txt'):
+            TESTED_FILE = open(f'{COMMAND_FILE_NAME}/command_file.txt')
             for index, LINE in enumerate(TESTED_FILE):
                 self.assertEqual(LINE, TESTER_LINES[index])
-            os.remove(f'{COMMAND_FILE_NAME}/command_file.txt')
         else:
-            self.fail('The command_file.txt was not properly created (Does not exist).')
+            self.fail('The command_file.txt was not properly created in /tmp.')
