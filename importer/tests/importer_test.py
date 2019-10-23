@@ -6,7 +6,7 @@ from unittest.mock import patch
 OUTPUT = 'base'
 TICKET = 123
 DATABASE = 'database'
-COMMAND_FILE_NAME = '.'
+COMMAND_FILE_NAME = '/tmp'
 COMMAND_1 = DataImporter('base/123', 123, 0, 'database')
 COMMAND_2 = DataImporter('base/123', 123, 1, 'database')
 COMMANDS = [COMMAND_1, COMMAND_2]
@@ -39,20 +39,20 @@ class importerTesting(unittest.TestCase):
                         '\n',
                         'cd /software/pathogen/projects/update_pipeline\n',
                         '\n',
-                        'bsub -o base/123/external_123_0.log -e base/123/external_123_0.err -M2000 \\\n',
+                        f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}_0.log -e {OUTPUT}/{TICKET}/external_{TICKET}_0.err -M2000 \\\n',
                         '''  -R "select[mem>2000] rusage[mem=2000]" './bin/update_pipeline_from_spreadsheet.pl \\\n''',
-                        '  -d database \\\n',
-                        '  -f base/123 \\\n',
-                        '  -p /lustre/scratch118/infgen/pathogen/pathpipe/database/seq-pipelines \\\n',
-                        "  base/123/external_123_0.xls'\n",
+                        f'  -d {DATABASE} \\\n',
+                        f'  -f {OUTPUT}/{TICKET} \\\n',
+                        f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
+                        f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xls'\n",
                         '\n',
                         '\n',
-                        'bsub -o base/123/external_123_1.log -e base/123/external_123_1.err -M2000 \\\n',
+                        f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}_1.log -e {OUTPUT}/{TICKET}/external_{TICKET}_1.err -M2000 \\\n',
                         '''  -R "select[mem>2000] rusage[mem=2000]" './bin/update_pipeline_from_spreadsheet.pl \\\n''',
-                        '  -d database \\\n',
-                        '  -f base/123 \\\n',
-                        '  -p /lustre/scratch118/infgen/pathogen/pathpipe/database/seq-pipelines \\\n',
-                        "  base/123/external_123_1.xls'\n",
+                        f'  -d {DATABASE} \\\n',
+                        f'  -f {OUTPUT}/{TICKET} \\\n',
+                        f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
+                        f"  {OUTPUT}/{TICKET}/external_{TICKET}_1.xls'\n",
                         '\n',
                         '\n',
                         'Then following the external data import SOP to register the study\n',
@@ -66,5 +66,4 @@ class importerTesting(unittest.TestCase):
                 self.assertEqual(LINE, TESTER_LINES[index])
             os.remove(f'{COMMAND_FILE_NAME}/command_file.txt')
         else:
-            No_File = 'The command_file.txt was not properly created (Does not exist).'
-            raise Exception(No_File)
+            self.fail('The command_file.txt was not properly created (Does not exist).')

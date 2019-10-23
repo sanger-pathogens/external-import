@@ -47,10 +47,10 @@ class TestXlsGeneration(unittest.TestCase):
     def test_of_OutputSpreadsheetGenerator(self):
         sheet = self.make_spreadsheet_for_test()
         self.run_tested_function(sheet)
-        self.testing_loop()
+        self.run_workbook_assertions()
         os.remove('workbook.xls')
 
-    def testing_loop(self):
+    def run_workbook_assertions(self):
         WORKBOOK_UNDER_TEST = xlrd.open_workbook('workbook.xls')
         SHEET_UNDER_TEST = WORKBOOK_UNDER_TEST.sheet_by_index(0)
         BREAKPOINT_SPREADSHEET = xlrd.open_workbook('test_breakpoint_functionality.xls')
