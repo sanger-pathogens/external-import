@@ -1,7 +1,5 @@
 import unittest
 import os
-import glob
-from tempfile import NamedTemporaryFile
 from importer.importer import DataImporter
 from unittest.mock import patch
 
@@ -22,14 +20,6 @@ def glob_replacer(ticket_string, recursive):
         GLOB_LIST = ['one', 'two']
         return GLOB_LIST
 
-# def temp_file(name, condition):
-#     *direct, filename = name.split('/')
-#     direction = '/'.join(direct)
-#     pref, suf = filename.split('.')
-#     open_file = NamedTemporaryFile(mode=condition, dir=direction, prefix=pref, suffix=suf, delete=False)
-#     return open_file
-
-
 class importerTesting(unittest.TestCase):
 
     def test_importer_setup(self):
@@ -44,7 +34,6 @@ class importerTesting(unittest.TestCase):
 
 
     def test_importer_printout(self):
-        # with patch('builtins.open', side_effect=temp_file):
         TESTER_LINES = ['\n',
             '        Execute the below to import:\n',
             '\n',
@@ -71,18 +60,6 @@ class importerTesting(unittest.TestCase):
 
         DataImporter.load(COMMANDS, COMMAND_FILE_NAME)
 
-        # COMMAND_FILE = glob.glob(f'{COMMAND_FILE_NAME}/command_file*txt')
-        # if len(COMMAND_FILE) > 1:
-        #     for command in COMMAND_FILE:
-        #         os.remove(command)
-        #     self.fail('Multiple existing command files')
-        # elif len(COMMAND_FILE) < 1:
-        #     self.fail('Command file failed to create in correct location')
-        # else:
-        #     TESTED_FILE = open(COMMAND_FILE[0])
-        #     for index, LINE in enumerate(TESTED_FILE):
-        #         self.assertEqual(LINE, TESTER_LINES[index])
-        #     TESTED_FILE.close()
         if os.path.isfile(f'/tmp/command_file.txt'):
             TESTED_FILE = open(f'{COMMAND_FILE_NAME}/command_file.txt')
             for index, LINE in enumerate(TESTED_FILE):

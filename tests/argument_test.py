@@ -71,10 +71,10 @@ class TestPrepareCommandArguments(unittest.TestCase):
             ["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-b", "invalid_break"])
         self.assertIsNone(actual)
 
-    def test_breakpoint_defaults_to_150(self):
+    def test_breakpoint_defaults_to_0(self):
         actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123"])
         expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=150)
+                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=0)
         self.assertEqual(actual, expected)
 
 

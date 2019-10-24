@@ -43,17 +43,18 @@ class TestFileCopy(unittest.TestCase):
 
 
 class TestXlsGeneration(unittest.TestCase):
+    data_dir = os.path.dirname(os.path.abspath(__file__))
 
     def test_of_OutputSpreadsheetGenerator(self):
-        sheet = self.make_spreadsheet_for_test()
-        self.run_tested_function(sheet)
+        sheet = self.make_spreadsheet()
+        self.run_function(sheet)
         self.run_workbook_assertions()
         os.remove('workbook.xls')
 
     def run_workbook_assertions(self):
         WORKBOOK_UNDER_TEST = xlrd.open_workbook('workbook.xls')
         SHEET_UNDER_TEST = WORKBOOK_UNDER_TEST.sheet_by_index(0)
-        BREAKPOINT_SPREADSHEET = xlrd.open_workbook('test_breakpoint_functionality.xls')
+        BREAKPOINT_SPREADSHEET = xlrd.open_workbook(os.path.join(self.data_dir, 'test_breakpoint_functionality.xls'))
         BREAKPOINT_FIRSTSHEET = BREAKPOINT_SPREADSHEET.sheet_by_index(0)
         for row in range(10):
             for col in range(10):
@@ -71,14 +72,14 @@ class TestXlsGeneration(unittest.TestCase):
                     self.assertEqual(SHEET_UNDER_TEST.cell_value(row, col),
                                      BREAKPOINT_FIRSTSHEET.cell_value(row, col))
 
-    def run_tested_function(self, sheet):
+    def run_function(self, sheet):
         generator = OutputSpreadsheetGenerator(sheet, A_POSITION)
         workbook, file_ended, current_position = generator.build(A_BREAKPOINT)
         workbook.save('workbook.xls')
         self.assertEqual((current_position, file_ended), (2, True))
         return current_position, file_ended
 
-    def make_spreadsheet_for_test(self):
+    def make_spreadsheet(self):
         sheet = Spreadsheet()
         sheet.supplier, sheet.organisation, sheet.contact, sheet.technology, sheet.name, sheet.accession, sheet.size, \
         sheet.limit = ('Supplier', 'Org', 'Contact', 'Illumina', 'AStudyName1', None, 1.90, '01/01/2025')
