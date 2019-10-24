@@ -25,17 +25,24 @@ def validate(arguments: argparse.Namespace):
 def prepare(arguments: argparse.Namespace):
     loader = SpreadsheetLoader(arguments.spreadsheet)
     sheet = loader.load()
-    generator = OutputSpreadsheetGenerator(sheet)
-    workbook = generator.build()
-    preparation = Preparation.new_instance(sheet, arguments.output, arguments.ticket)
-    preparation.create_destination_directory()
+
+    ### Run iterable for length of reads from here
+    file_ended = False
+    instance = 0
+    current_position = 0
+    while file_ended == False:
+        generator = OutputSpreadsheetGenerator(sheet, current_position)
+        workbook, file_ended, current_position = generator.build(arguments.breakpoint)
+        preparation = Preparation.new_instance(sheet, arguments.output, arguments.ticket, instance)
+        preparation.create_destination_directory()
+        preparation.save_workbook(workbook)
+        instance += 1
     preparation.copy_files(arguments.input)
-    preparation.save_workbook(workbook)
 
 
 def load(arguments: argparse.Namespace):
     importer = DataImporter.new_instance(arguments.output, arguments.ticket, arguments.database)
-    importer.load()
+    DataImporter.load(importer, arguments.commands)
 
 
 parser = ArgumentParser(validate, prepare, load)
@@ -46,3 +53,5 @@ if args is not None and args.execute is not None:
 # TODO: check it is running as the desired user.
 # TODO: revisit the design of validation (either object or function composition)
 # TODO: Add validation for unused fields in header (Supplier Name, etc....)
+# TODO: fix copy file tests in writer test module
+# TODO: alter importer test to use temporary files

@@ -1,6 +1,7 @@
-from os import mkdir
+from os import mkdir, path
 from shutil import copyfile
 
+import sys
 import xlwt
 
 from importer.model import Spreadsheet
@@ -8,10 +9,11 @@ from importer.model import Spreadsheet
 
 class Preparation:
 
+
     @staticmethod
-    def new_instance(spreadsheet: Spreadsheet, base: str, ticket: int):
+    def new_instance(spreadsheet: Spreadsheet, base: str, ticket: int, instance: int):
         destination = "%s/%d" % (base, ticket)
-        return Preparation(spreadsheet, destination, '%s/external_%d.xls' % (destination, ticket))
+        return Preparation(spreadsheet, destination, '%s/external_%d_%d.xls' % (destination, ticket, instance))
 
     def __init__(self, spreadsheet: Spreadsheet, destination: str, spreadsheet_file: str):
         self.spreadsheet = spreadsheet
@@ -19,7 +21,7 @@ class Preparation:
         self.spreadsheet_file = spreadsheet_file
 
     def copy_files(self, source: str):
-        for read in self.spreadsheet.reads:
+        for read in self.spreadsheet._sheet.reads:
             copyfile("%s/%s" % (source, read.forward_read), "%s/%s" % (self.destination, read.forward_read))
             if read.reverse_read is not None:
                 copyfile("%s/%s" % (source, read.reverse_read), "%s/%s" % (self.destination, read.reverse_read))
@@ -28,21 +30,23 @@ class Preparation:
         workbook.save(self.spreadsheet_file)
 
     def create_destination_directory(self):
-        mkdir(self.destination)
-
+        if path.isdir(self.destination) == False:
+            mkdir(self.destination)
 
 class OutputSpreadsheetGenerator:
 
-    def __init__(self, spreadsheet: Spreadsheet):
+    def __init__(self, spreadsheet: Spreadsheet, current_position: int):
         self.spreadsheet = spreadsheet
+        self.row = current_position
+        self.status_closed = False
         self.workbook = xlwt.Workbook()
         self.sheet = self.workbook.add_sheet('Sheet1')
 
-    def build(self):
+    def build(self, breakpoint: int):
         self.build_import_info()
         self.build_read_headers()
-        self.build_read_data()
-        return self.workbook
+        self.build_read_data(breakpoint if breakpoint > 0 else sys.maxsize)
+        return self.workbook, self.status_closed, self.row
 
     def build_import_info(self):
 
@@ -55,16 +59,23 @@ class OutputSpreadsheetGenerator:
         self.write_string(6, 'Total size of files in GBytes', self.spreadsheet.size)
         self.write_string(7, 'Data to be kept until', self.spreadsheet.limit)
 
-    def build_read_data(self):
-        row = 10
-        for read in self.spreadsheet.reads:
-            self.sheet.write(row, 0, read.forward_read)
-            if read.reverse_read is not None:
-                self.sheet.write(row, 1, read.reverse_read)
-            self.sheet.write(row, 2, read.sample_name)
-            self.sheet.write(row, 4, read.taxon_id)
-            self.sheet.write(row, 5, read.library_name)
-            row += 1
+    def build_read_data(self, breakpoint: int):
+        for read in range(breakpoint):
+            position = read + 10
+            end_reached = self.row == len(self.spreadsheet.reads)
+            if end_reached:
+                self.status_closed = True
+                break
+            current_row = self.spreadsheet.reads[self.row]
+            self.sheet.write(position, 0, current_row.forward_read)
+            if current_row.reverse_read is not None:
+                self.sheet.write(position, 1, current_row.reverse_read)
+            self.sheet.write(position, 2, current_row.sample_name)
+            self.sheet.write(position, 4, current_row.taxon_id)
+            self.sheet.write(position, 5, current_row.library_name)
+            self.row += 1
+        if self.row == len(self.spreadsheet.reads):
+            self.status_closed = True
 
     def build_read_headers(self):
         index = 0
