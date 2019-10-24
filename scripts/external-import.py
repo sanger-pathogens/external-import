@@ -53,3 +53,5 @@ if args is not None and args.execute is not None:
 # TODO: check it is running as the desired user.
 # TODO: revisit the design of validation (either object or function composition)
 # TODO: Add validation for unused fields in header (Supplier Name, etc....)
+# TODO: fix copy file tests in writer test module
+# TODO: alter importer test to use temporary files
