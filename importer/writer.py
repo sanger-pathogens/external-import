@@ -21,7 +21,7 @@ class Preparation:
         self.spreadsheet_file = spreadsheet_file
 
     def copy_files(self, source: str):
-        for read in self.spreadsheet._sheet.reads:
+        for read in self.spreadsheet.reads:
             copyfile("%s/%s" % (source, read.forward_read), "%s/%s" % (self.destination, read.forward_read))
             if read.reverse_read is not None:
                 copyfile("%s/%s" % (source, read.reverse_read), "%s/%s" % (self.destination, read.reverse_read))
