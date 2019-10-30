@@ -1,7 +1,7 @@
 import unittest
 
 from importer.model import Spreadsheet, RawRead
-from importer.validation import validate_study_name, validate_study_name_length, validate_mandatory_read_fields, \
+from importer.validation import validate_study_name, validate_mandatory_read_fields, \
     validate_files_are_compressed, validate_pair_naming_convention, validate_uniqueness_of_reads, \
     validate_no_path_in_filename, validate_external_data_part_of_internal_sequencing_study_name
 
@@ -14,22 +14,6 @@ class TestStudyNameContent(unittest.TestCase):
     def test_study_name_with_invalid_char_should_fail_validation(self):
         self.assertEqual(34,
                          len(validate_study_name(Spreadsheet.new_instance("!\"£$%^&*()+={}[]:@~;'#?/>.<,|\\`¬ \t"))))
-
-
-class TestStudyNameLength(unittest.TestCase):
-    def test_study_name_of_15_chars_or_less_are_valid(self):
-        self.assertEqual([], validate_study_name_length(Spreadsheet.new_instance("123456789012345")))
-
-    def test_study_name_of_15_chars_or_less_without_external_suffix_are_valid(self):
-        self.assertEqual([], validate_study_name_length(Spreadsheet.new_instance("123456789012345_external")))
-
-    def test_study_name_longer_than_15_characters_should_fail(self):
-        self.assertEqual(["Spreadsheet name is longer than 15 chars"],
-                         validate_study_name_length(Spreadsheet.new_instance("1234567890123456")))
-
-    def test_study_name_longer_than_15_without_external_suffix_are_valid(self):
-        self.assertEqual(["Spreadsheet name excluding '_external' suffix is longer than 15 chars"],
-                         validate_study_name_length(Spreadsheet.new_instance("1234567890123456_external")))
 
 
 class TestStudyNameWhenPartOfInternalSequencing(unittest.TestCase):

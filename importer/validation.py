@@ -7,8 +7,7 @@ from importer.model import Spreadsheet, RawRead
 
 def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool):
     results = []
-    validators = [validate_study_name_length,
-                  validate_study_name,
+    validators = [validate_study_name,
                   validate_mandatory_read_fields,
                   validate_files_are_compressed,
                   validate_pair_naming_convention,
@@ -33,13 +32,6 @@ def validate_external_data_part_of_internal_sequencing_study_name(spreadsheet: S
         return []
     return ["Data part of internal sequencing study should have the suffix '_external' in the name: %s"
             % spreadsheet.name]
-
-
-def validate_study_name_length(spreadsheet: Spreadsheet) -> List[str]:
-    if spreadsheet.name.endswith('_external'):
-        validate = spreadsheet.name.replace('_external', '')
-        return [] if len(validate) <= 15 else ["Spreadsheet name excluding '_external' suffix is longer than 15 chars"]
-    return [] if len(spreadsheet.name) <= 15 else ["Spreadsheet name is longer than 15 chars"]
 
 
 def validate_mandatory_read_fields(spreadsheet):
