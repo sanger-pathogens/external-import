@@ -176,10 +176,10 @@ class TestValidatePairReadsFileNamingConvention(unittest.TestCase):
 class TestReadsAreCompressed(unittest.TestCase):
 
     def test_reads_are_not_compressed(self):
-        self.assertEqual(["Forward read is not compressed with gz for RawRead(forward_read='PAIR1_1.fastq', "
+        self.assertEqual(["Forward read file is not correctly formatted for RawRead(forward_read='PAIR1_1.fastq', "
                           "reverse_read='PAIR1_2.fastq', sample_name='SAMPLE1', sample_accession=None, "
                           "taxon_id='1280', library_name='LIB1')",
-                          "Reverse read is not compressed with gz for RawRead(forward_read='PAIR1_1.fastq', "
+                          "Reverse read file is not correctly formatted for RawRead(forward_read='PAIR1_1.fastq', "
                           "reverse_read='PAIR1_2.fastq', sample_name='SAMPLE1', sample_accession=None, "
                           "taxon_id='1280', library_name='LIB1')"],
                          validate_files_are_compressed(
