@@ -1,5 +1,7 @@
 import unittest
+from unittest.mock import patch
 
+from importer.pfchecks import output_directory_for_lanes_and_samples_exists, print_pf_checks
 from importer.model import Spreadsheet, RawRead
 from importer.validation import validate_study_name, validate_mandatory_read_fields, \
     validate_files_are_compressed, validate_pair_naming_convention, validate_uniqueness_of_reads, \
@@ -176,16 +178,44 @@ class TestValidatePairReadsFileNamingConvention(unittest.TestCase):
 class TestReadsAreCompressed(unittest.TestCase):
 
     def test_reads_are_not_compressed(self):
-        self.assertEqual(["Forward read is not compressed with gz for RawRead(forward_read='PAIR1_1.fastq', "
+        self.assertEqual(["Forward read file is not correctly formatted for RawRead(forward_read='PAIR1_1.fastq', "
                           "reverse_read='PAIR1_2.fastq', sample_name='SAMPLE1', sample_accession=None, "
                           "taxon_id='1280', library_name='LIB1')",
-                          "Reverse read is not compressed with gz for RawRead(forward_read='PAIR1_1.fastq', "
+                          "Reverse read file is not correctly formatted for RawRead(forward_read='PAIR1_1.fastq', "
                           "reverse_read='PAIR1_2.fastq', sample_name='SAMPLE1', sample_accession=None, "
                           "taxon_id='1280', library_name='LIB1')"],
                          validate_files_are_compressed(
                              Spreadsheet.new_instance("1234567890123456",
                                                       [RawRead(sample_accession=None, forward_read='PAIR1_1.fastq',
                                                                reverse_read='PAIR1_2.fastq',
+                                                               sample_name='SAMPLE1', taxon_id="1280",
+                                                               library_name='LIB1')])))
+
+    def test_reads_are_not_fastq(self):
+        self.assertEqual(["Forward read file is not correctly formatted for RawRead(forward_read='PAIR1_1.gz', "
+                          "reverse_read='PAIR1_2.gz', sample_name='SAMPLE1', sample_accession=None, "
+                          "taxon_id='1280', library_name='LIB1')",
+                          "Reverse read file is not correctly formatted for RawRead(forward_read='PAIR1_1.gz', "
+                          "reverse_read='PAIR1_2.gz', sample_name='SAMPLE1', sample_accession=None, "
+                          "taxon_id='1280', library_name='LIB1')"],
+                         validate_files_are_compressed(
+                             Spreadsheet.new_instance("1234567890123456",
+                                                      [RawRead(sample_accession=None, forward_read='PAIR1_1.gz',
+                                                               reverse_read='PAIR1_2.gz',
+                                                               sample_name='SAMPLE1', taxon_id="1280",
+                                                               library_name='LIB1')])))
+
+    def test_reads_are_incorrectly_ended(self):
+        self.assertEqual(["Forward read file is not correctly formatted for RawRead(forward_read='PAIR1_INCORRECT.fastq.gz', "
+                          "reverse_read='PAIR1.fastq.gz', sample_name='SAMPLE1', sample_accession=None, "
+                          "taxon_id='1280', library_name='LIB1')",
+                          "Reverse read file is not correctly formatted for RawRead(forward_read='PAIR1_INCORRECT.fastq.gz', "
+                          "reverse_read='PAIR1.fastq.gz', sample_name='SAMPLE1', sample_accession=None, "
+                          "taxon_id='1280', library_name='LIB1')"],
+                         validate_files_are_compressed(
+                             Spreadsheet.new_instance("1234567890123456",
+                                                      [RawRead(sample_accession=None, forward_read='PAIR1_INCORRECT.fastq.gz',
+                                                               reverse_read='PAIR1.fastq.gz',
                                                                sample_name='SAMPLE1', taxon_id="1280",
                                                                library_name='LIB1')])))
 
@@ -266,3 +296,21 @@ class TestMandatoryFieldsForReads(unittest.TestCase):
                                                                reverse_read=None,
                                                                sample_name='SAMPLE1', taxon_id="1280",
                                                                library_name=None)])))
+
+class TestDirectoryCallForPF(unittest.TestCase):
+    def test_output_directory_present(self):
+        with patch('os.path.isdir', return_value=True) as path_search:
+            with patch('os.mkdir') as mocked_dir:
+                output_directory_for_lanes_and_samples_exists('dir/')
+
+                path_search.assert_called_once_with('dir/')
+                mocked_dir.assert_not_called()
+
+
+    def test_output_directory_generated(self):
+        with patch('os.path.isdir', return_value=False) as path_search:
+            with patch('os.mkdir') as mocked_dir:
+                output_directory_for_lanes_and_samples_exists('dir/')
+
+                path_search.assert_called_once_with('dir/')
+                mocked_dir.assert_called_once_with('dir/')

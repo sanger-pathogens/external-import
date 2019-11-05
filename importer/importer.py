@@ -31,6 +31,7 @@ cd /software/pathogen/projects/update_pipeline
         for command in commands:
             command_file.write(f"""
 bsub -o {command.destination}/external_{command.ticket}_{command.index}.log -e {command.destination}/external_{command.ticket}_{command.index}.err -M2000 \\
+  -J external_{command.ticket}_{command.index} -q long \\
   -R "select[mem>2000] rusage[mem=2000]" './bin/update_pipeline_from_spreadsheet.pl \\
   -d {command.database} \\
   -f {command.destination} \\

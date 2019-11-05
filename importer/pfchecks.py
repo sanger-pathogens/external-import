@@ -1,20 +1,32 @@
 import re
+import os
 
 
 def print_pf_checks(spreadsheet, outputdir):
     print("Congratulations, the validation was successful, you now need to perform the below manual checks...:")
     __study_name_should_not_exists(spreadsheet)
+    __output_directory_for_lanes_and_samples_exists(outputdir)
     __sample_names_should_be_unique_across_the_database(spreadsheet, outputdir)
     __lane_names_should_be_unique_across_the_database(spreadsheet, outputdir)
 
 
 def __study_name_should_not_exists(spreadsheet):
-    cmd = "pf data -t study -i %s" % spreadsheet.name
-    print("""
-Check that the study name doesn't already exist, the following command should return no data:
-%s
-If it does, rename the study to %s
-""" % (cmd, spreadsheet.name + "_external"))
+    cmd = f"pf data -t study -i {spreadsheet.name}"
+    print(f"""
+Check for presence of the study; run the following command:
+{cmd}
+
+If this command returns data check with the requestor if they want to append
+to the existing study - if not, the name needs to be changed
+""" )
+
+
+def output_directory_for_lanes_and_samples_exists(outputdir):
+    if not os.path.isdir(outputdir):
+        os.mkdir(outputdir)
+        print(f"""
+        WARNING: Output directory not found. A directory for lanes and samples has been created at '{outputdir}'
+""")
 
 
 def __sample_names_should_be_unique_across_the_database(spreadsheet, outputdir):
