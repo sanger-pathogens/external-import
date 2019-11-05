@@ -21,7 +21,7 @@ to the existing study - if not, the name needs to be changed
 """ )
 
 
-def __output_directory_for_lanes_and_samples_exists(outputdir):
+def output_directory_for_lanes_and_samples_exists(outputdir):
     if not os.path.isdir(outputdir):
         os.mkdir(outputdir)
         print(f"""
