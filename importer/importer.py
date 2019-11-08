@@ -1,4 +1,5 @@
 import glob
+import os
 
 class DataImporter:
 
@@ -21,9 +22,10 @@ class DataImporter:
 
     @staticmethod
     def load(commands, command_file_name):
-        command_file = open(f'{command_file_name}/command_file.txt','w')
-        command_file.write("""
-        Execute the below to import:
+        command_file = open(f'{command_file_name}/command_file.sh','w')
+        command_file.write("""#!/bin/bash
+
+    # Execute the below to import:
 
 cd /software/pathogen/projects/update_pipeline
 """)
@@ -40,7 +42,8 @@ bsub -o {command.destination}/external_{command.ticket}_{command.index}.log -e {
 
 """)
         command_file.write("""
-Then following the external data import SOP to register the study
+# Then following the external data import SOP to register the study
 """)
 
         command_file.close()
+        os.chmod(f'{command_file_name}/command_file.sh', 0o755)

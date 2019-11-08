@@ -34,8 +34,9 @@ class importerTesting(unittest.TestCase):
 
 
     def test_importer_printout(self):
-        TESTER_LINES = ['\n',
-            '        Execute the below to import:\n',
+        TESTER_LINES = ['#!/bin/bash\n',
+            '\n',
+            '    # Execute the below to import:\n',
             '\n',
             'cd /software/pathogen/projects/update_pipeline\n',
             '\n',
@@ -57,14 +58,14 @@ class importerTesting(unittest.TestCase):
             f"  {OUTPUT}/{TICKET}/external_{TICKET}_1.xls'\n",
             '\n',
             '\n',
-            'Then following the external data import SOP to register the study\n',
+            '# Then following the external data import SOP to register the study\n',
             '\n']
 
         DataImporter.load(COMMANDS, COMMAND_FILE_NAME)
 
-        if os.path.isfile(f'/tmp/command_file.txt'):
-            TESTED_FILE = open(f'{COMMAND_FILE_NAME}/command_file.txt')
+        if os.path.isfile(f'/tmp/command_file.sh'):
+            TESTED_FILE = open(f'{COMMAND_FILE_NAME}/command_file.sh')
             for index, LINE in enumerate(TESTED_FILE):
                 self.assertEqual(LINE, TESTER_LINES[index])
         else:
-            self.fail('The command_file.txt was not properly created in /tmp.')
+            self.fail('The command_file.sh was not properly created in /tmp.')
