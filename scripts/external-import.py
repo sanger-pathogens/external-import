@@ -3,6 +3,7 @@
 import argparse
 from sys import argv
 
+#from importer.argument_parser import ArgumentParser
 from importer.argument_parser import ArgumentParser
 from importer.importer import DataImporter
 from importer.loader import SpreadsheetLoader
@@ -10,7 +11,6 @@ from importer.pfchecks import print_pf_checks
 from importer.validation import validate_spreadsheet
 from importer.writer import Preparation, \
     OutputSpreadsheetGenerator
-
 
 def validate(arguments: argparse.Namespace):
     loader = SpreadsheetLoader(arguments.spreadsheet)
@@ -37,7 +37,10 @@ def prepare(arguments: argparse.Namespace):
         preparation.create_destination_directory()
         preparation.save_workbook(workbook)
         instance += 1
-    preparation.copy_files(arguments.input)
+    if arguments.input.upper() =='ENA':
+        preparation.download_files_from_ena()
+    else:
+        preparation.copy_files(arguments.input)
 
 
 def load(arguments: argparse.Namespace):

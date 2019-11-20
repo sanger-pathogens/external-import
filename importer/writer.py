@@ -3,8 +3,10 @@ from shutil import copyfile
 
 import sys
 import xlwt
+import pandas as pd
 
 from importer.model import Spreadsheet
+from importer.run_bash_command import runrealcmd
 
 
 class Preparation:
@@ -25,6 +27,11 @@ class Preparation:
             copyfile("%s/%s" % (source, read.forward_read), "%s/%s" % (self.destination, read.forward_read))
             if read.reverse_read is not None:
                 copyfile("%s/%s" % (source, read.reverse_read), "%s/%s" % (self.destination, read.reverse_read))
+
+    def download_files_from_ena(self):
+        df = pd.DataFrame(([read.forward_read, 'bsub -o %s.o -e %s.e "/Users/km22/Documents/git_projects/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s"' % (read.forward_read, read.forward_read, self.destination, read.forward_read)] for read in self.spreadsheet.reads), columns = ('Read accession', 'Command'))
+        print(df.head())
+        df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
 
     def save_workbook(self, workbook):
         workbook.save(self.spreadsheet_file)
