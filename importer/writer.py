@@ -29,9 +29,13 @@ class Preparation:
                 copyfile("%s/%s" % (source, read.reverse_read), "%s/%s" % (self.destination, read.reverse_read))
 
     def download_files_from_ena(self):
-        df = pd.DataFrame(([read.forward_read, 'bsub -o %s.o -e %s.e "/nfs/users/nfs_k/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s"' % (read.forward_read, read.forward_read, self.destination, read.forward_read)] for read in self.spreadsheet.reads), columns = ('Read accession', 'Command'))
+        df = pd.DataFrame(([read.forward_read, 'bsub -w -o %s.o -e %s.e -J import%s "/nfs/users/nfs_k/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s"' % (read.forward_read, read.forward_read, read.forward_read, self.destination, read.forward_read)] for read in self.spreadsheet.reads), columns = ('Read accession', 'Command'))
         print(df.head())
+        job_names = df['Read accession'][5:]
+        #append to the start some null values
+        df['job_to_depend_on']=job_names
         df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
+        #change this to run the command with -w job to depend on concat on 
 
     def save_workbook(self, workbook):
         workbook.save(self.spreadsheet_file)
