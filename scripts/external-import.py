@@ -37,7 +37,7 @@ def prepare(arguments: argparse.Namespace):
         preparation.create_destination_directory()
         preparation.save_workbook(workbook)
         instance += 1
-    if arguments.input.upper() =='ENA':
+    if arguments.download ==True:
         preparation.download_files_from_ena(connections=arguments.connections)
     else:
         preparation.copy_files(arguments.input)

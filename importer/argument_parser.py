@@ -34,9 +34,10 @@ class ArgumentParser:
     def _build_preparation_parser(self, preparation_parser):
         preparation_parser.add_argument('-s', '--spreadsheet', required=True, help='Spreadsheet to validate')
         preparation_parser.add_argument('-t', '--ticket', type=int, required=True, help='RT Ticket number')
-        preparation_parser.add_argument('-i', '--input', required=True,
-                                        help='Directory containing the read files or ENA if files are to be downloaded.')
-        preparation_parser.add_argument('-c', '--connections', type=int, choices=range(1,1000), required=False, default=10,
+        group = preparation_parser.add_mutually_exclusive_group(required=True)
+        group.add_argument('-i', '--input', help='Directory containing the read files to be copied.')
+        group.add_argument('-dl', '--download', help='Use this flag to download the fastq files from ENA', action='store_true')
+        preparation_parser.add_argument('-c', '--connections', type=int, choices=range(1,1000), default=10,
                                         help='Number of connections to ENA to be made at a time if files are to be downloaded. Default is 10.')
         preparation_parser.add_argument('-o', '--output', required=True, help='Base directory for import datas')
         preparation_parser.add_argument('-b', '--breakpoint', type=int, required=False, default=0,

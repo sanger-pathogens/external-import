@@ -38,19 +38,30 @@ class TestPrepareCommandArguments(unittest.TestCase):
         self.preparation_function = Mock()
         self.under_test = ArgumentParser(prepare=self.preparation_function)
 
-    def test_should_parse_valid_arguments(self):
+    def test_should_parse_valid_arguments_copy_input(self):
         actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123",
-                                        "-b", "456", "-c","50"])
+                                        "-b", "456"])
         expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=456, connections=50)
+                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=456, connections=10, download=False)
+        self.assertEqual(actual, expected)
+
+    def test_should_parse_valid_arguments_download_ENA(self):
+        actual = self.under_test.parse(["prepare", "-dl", "-c", "50", "-s", "test_upload.xls", "-o", "output", "-t", "123"])
+        expected = argparse.Namespace(output='output', input=None, execute=self.preparation_function,
+                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=0, connections=50,
+                                      download=True)
         self.assertEqual(actual, expected)
 
     def test_spreadsheet_is_mandatory(self):
         actual = self.under_test.parse(["prepare", "-i", "input", "-o", "output", "-t", "123"])
         self.assertIsNone(actual)
 
-    def test_input_is_mandatory(self):
+    def test_input_or_download_is_mandatory(self):
         actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-o", "output", "-t", "123"])
+        self.assertIsNone(actual)
+
+    def test_input_and_download_not_allowed(self):
+        actual = self.under_test.parse(["prepare", "-i", "input", "-dl", "-s", "test_upload.xls", "-o", "output", "-t", "123"])
         self.assertIsNone(actual)
 
     def test_output_is_mandatory(self):
@@ -72,9 +83,9 @@ class TestPrepareCommandArguments(unittest.TestCase):
         self.assertIsNone(actual)
 
     def test_breakpoint_defaults_to_0(self):
-        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-c","100"])
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123"])
         expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=0,connections=100)
+                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=0, connections=10, download=False)
         self.assertEqual(actual, expected)
 
     def test_connections_is_a_number(self):
@@ -85,7 +96,7 @@ class TestPrepareCommandArguments(unittest.TestCase):
     def test_connections_defaults_to_10(self):
         actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-b","10"])
         expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=10,connections=10)
+                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=10,connections=10, download=False)
         self.assertEqual(actual, expected)
 
     def test_connections_cant_be_0(self):
