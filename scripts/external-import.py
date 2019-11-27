@@ -38,7 +38,7 @@ def prepare(arguments: argparse.Namespace):
         preparation.save_workbook(workbook)
         instance += 1
     if arguments.input.upper() =='ENA':
-        preparation.download_files_from_ena()
+        preparation.download_files_from_ena(connections=arguments.connections)
     else:
         preparation.copy_files(arguments.input)
 
