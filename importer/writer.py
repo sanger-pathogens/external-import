@@ -32,7 +32,7 @@ class Preparation:
         df = pd.DataFrame(([read.forward_read, 'import_%s' % read.forward_read] for read in self.spreadsheet.reads), columns=('Read accession', 'Job_name'))
         for i in range(len(df)):
             df.loc[i,'enaDataGet_command'] = "/nfs/users/nfs_k/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s" % (self.destination, df.loc[i, 'Read accession'])
-            df.loc[i,'extract_data_command'] = 'mv %s/%s/* %s  && rm -rf %s/%s' % (self.destination, df.loc[i, 'Read accession'],self.destination, df.loc[i, 'Read accession'])
+            df.loc[i,'extract_data_command'] = 'mv %s/%s/* %s  && rm -rf %s/%s' % (self.destination, df.loc[i, 'Read accession'],self.destination, self.destination,df.loc[i, 'Read accession'])
         for i in range(connections, len(df)):
             df.loc[i, 'Job_to_depend_on'] = df.loc[i - connections, 'Job_name']
             df.loc[i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e -J import_%s -w %s "%s && %s"' % (self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'], df.loc[i, 'Read accession'],
