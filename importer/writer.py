@@ -39,7 +39,7 @@ class Preparation:
         for i in range(connections):
             df.loc[
                 i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e -J import_%s "/nfs/users/nfs_k/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s"' % (
-            self.destination, df.loc[i, 'Read accession'], df.loc[i, 'Read accession'], df.loc[i, 'Read accession'], self.destination,
+            self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'], df.loc[i, 'Read accession'], self.destination,
             df.loc[i, 'Read accession'])
         df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
 
