@@ -41,6 +41,22 @@ class TestFileCopy(unittest.TestCase):
                            call('source/PAIR1_2.fastq.gz', 'destination/0/PAIR1_2.fastq.gz'),
                            call('source/SINGLE.fastq.gz', 'destination/0/SINGLE.fastq.gz')])
 
+class TestFileDownload(unittest.TestCase):
+
+    @patch('importer.writer.runrealcmd')
+    def test_ENA_download(self, runrealcmd_patch):
+        connections=1
+        under_test = Preparation.new_instance(Spreadsheet.new_instance("MyStudy", [
+            RawRead(forward_read='Accession1', reverse_read='', sample_name='SAMPLE1',
+                    taxon_id='1280', library_name='LIB1', sample_accession=None),
+            RawRead(forward_read='Accession2', reverse_read=None, sample_name='SAMPLE2',
+                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), 'destination', 0, 0)
+        under_test.download_files_from_ena(connections)
+        print(runrealcmd_patch.call_args_list)
+        self.assertEqual(runrealcmd_patch.call_args_list,
+                         [call('bsub -o destination/0/Accession1.o -e destination/0/Accession1.e -J import_Accession1 "/nfs/users/nfs_k/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination/0 Accession1 && mv destination/0/Accession1/* destination/0  && rm -rf destination/0/Accession1"'),
+                          call('bsub -o destination/0/Accession2.o -e destination/0/Accession2.e -J import_Accession2 -w import_Accession1 "/nfs/users/nfs_k/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination/0 Accession2 && mv destination/0/Accession2/* destination/0  && rm -rf destination/0/Accession2"')])
+
 
 class TestXlsGeneration(unittest.TestCase):
     data_dir = os.path.dirname(os.path.abspath(__file__))

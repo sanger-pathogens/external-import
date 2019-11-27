@@ -40,9 +40,9 @@ class TestPrepareCommandArguments(unittest.TestCase):
 
     def test_should_parse_valid_arguments(self):
         actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123",
-                                        "-b", "456"])
+                                        "-b", "456", "-c","50"])
         expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=456)
+                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=456, connections=50)
         self.assertEqual(actual, expected)
 
     def test_spreadsheet_is_mandatory(self):
@@ -72,9 +72,30 @@ class TestPrepareCommandArguments(unittest.TestCase):
         self.assertIsNone(actual)
 
     def test_breakpoint_defaults_to_0(self):
-        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123"])
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-c","100"])
         expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=0)
+                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=0,connections=100)
+        self.assertEqual(actual, expected)
+
+    def test_connections_is_a_number(self):
+        actual = self.under_test.parse(
+            ["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-c", "invalid_number_of_connections"])
+        self.assertIsNone(actual)
+
+    def test_connections_defaults_to_10(self):
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-b","10"])
+        expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
+                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=10,connections=10)
+        self.assertEqual(actual, expected)
+
+    def test_connections_cant_be_0(self):
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-b","10","-c","0"])
+        expected = None
+        self.assertEqual(actual, expected)
+
+    def test_connections_cant_be_greater_than_1000(self):
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-b","10","-c","1001"])
+        expected = None
         self.assertEqual(actual, expected)
 
 

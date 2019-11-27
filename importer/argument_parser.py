@@ -36,7 +36,7 @@ class ArgumentParser:
         preparation_parser.add_argument('-t', '--ticket', type=int, required=True, help='RT Ticket number')
         preparation_parser.add_argument('-i', '--input', required=True,
                                         help='Directory containing the read files or ENA if files are to be downloaded.')
-        preparation_parser.add_argument('-c', '--connections', type=int, required=False, default=10,
+        preparation_parser.add_argument('-c', '--connections', type=int, choices=range(1,1000), required=False, default=10,
                                         help='Number of connections to ENA to be made at a time if files are to be downloaded. Default is 10.')
         preparation_parser.add_argument('-o', '--output', required=True, help='Base directory for import datas')
         preparation_parser.add_argument('-b', '--breakpoint', type=int, required=False, default=0,
