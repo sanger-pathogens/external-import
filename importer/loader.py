@@ -49,6 +49,7 @@ class SpreadsheetLoader:
                 if self._sheet.cell_value(header_row, i) == 'Mate File':
                     mate_filename_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Name':
+                print('here')
                 sample_name_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Accession number':
                 sample_accession_column = i
@@ -58,6 +59,7 @@ class SpreadsheetLoader:
                 library_name_column = i
         reads = []
         for i in range(data_row, self._sheet.nrows):
+            print('here2')
             sample_name = self.__extract_float_value(i, sample_name_column)
             library_name = self.__extract_float_value(i, library_name_column)
             if library_name is None:
