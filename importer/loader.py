@@ -33,23 +33,21 @@ class SpreadsheetLoader:
                 year, month, day, hour, minute, second = xlrd.xldate_as_tuple(self._sheet.cell_value(i, 1),
                                                                               self._workbook.datemode)
                 result.limit = "%02d/%02d/%04d" % (day, month, year)
-            if self._sheet.cell_value(i, 0) == 'Filename':
+            if self._sheet.cell_value(i, 0) == 'Filename' or self._sheet.cell_value(i, 0) == 'Run Accession':
                 data_row = i + 1
                 header_row = i
                 break
-
+        filename_column = None
+        run_accession_column = None
         for i in range(self._sheet.ncols):
-            filename_column = None
-            run_accession_column = None
             if self._sheet.cell_value(header_row, i) == 'Filename':
                 filename_column = i
-            elif self._sheet.cell_value(header_row, i) == 'Run Accession':
+            if self._sheet.cell_value(header_row, i) == 'Run Accession':
                 run_accession_column = i
             if filename_column is not None:
                 if self._sheet.cell_value(header_row, i) == 'Mate File':
                     mate_filename_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Name':
-                print('here')
                 sample_name_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Accession number':
                 sample_accession_column = i
@@ -59,7 +57,6 @@ class SpreadsheetLoader:
                 library_name_column = i
         reads = []
         for i in range(data_row, self._sheet.nrows):
-            print('here2')
             sample_name = self.__extract_float_value(i, sample_name_column)
             library_name = self.__extract_float_value(i, library_name_column)
             if library_name is None:
@@ -75,7 +72,7 @@ class SpreadsheetLoader:
             if run_accession_column is not None:
                 reads.append(RawRead(
                     (self.__extract_text_value(i, run_accession_column)+'_1.fastq.gz'),
-                    (self.__extract_text_value(i, run_accession_column)+'2.fastq.gz'),
+                    (self.__extract_text_value(i, run_accession_column)+'_2.fastq.gz'),
                     sample_name,
                     self.__extract_text_value(i, sample_accession_column),
                     self.__extract_float_value(i, taxon_id_column),
