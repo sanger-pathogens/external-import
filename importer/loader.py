@@ -41,8 +41,11 @@ class SpreadsheetLoader:
         for i in range(self._sheet.ncols):
             if self._sheet.cell_value(header_row, i) == 'Filename':
                 filename_column = i
-            if self._sheet.cell_value(header_row, i) == 'Mate File':
-                mate_filename_column = i
+            elif self._sheet.cell_value(header_row, i) == 'Run accession':
+                run_accession_column = i
+            if filename_column is not None:
+                if self._sheet.cell_value(header_row, i) == 'Mate File':
+                    mate_filename_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Name':
                 sample_name_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Accession number':
@@ -57,13 +60,22 @@ class SpreadsheetLoader:
             library_name = self.__extract_float_value(i, library_name_column)
             if library_name is None:
                 library_name = sample_name
-            reads.append(RawRead(
-                self.__extract_text_value(i, filename_column),
-                self.__extract_text_value(i, mate_filename_column),
-                sample_name,
-                self.__extract_text_value(i, sample_accession_column),
-                self.__extract_float_value(i, taxon_id_column),
-                library_name))
+            if filename_column is not None:
+                reads.append(RawRead(
+                    self.__extract_text_value(i, filename_column),
+                    self.__extract_text_value(i, mate_filename_column),
+                    sample_name,
+                    self.__extract_text_value(i, sample_accession_column),
+                    self.__extract_float_value(i, taxon_id_column),
+                    library_name))
+            if run_accession_column is not None:
+                reads.append(RawRead(
+                    (self.__extract_text_value(i, run_accession_column)+'_1.fastq.gz'),
+                    (self.__extract_text_value(i, run_accession_column)+'2.fastq.gz'),
+                    sample_name,
+                    self.__extract_text_value(i, sample_accession_column),
+                    self.__extract_float_value(i, taxon_id_column),
+                    library_name))
         result.reads = reads
         return result
 

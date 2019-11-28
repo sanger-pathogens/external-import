@@ -50,4 +50,5 @@ class ArgumentParser:
                                        default=False, help='External data part of an internally sequenced study')
         validation_parser.add_argument('-o', '--output', required=True,
                                        help='Output director for generated lane and sample files for pf')
+        #validation_parser.add_argument('-t','')
         validation_parser.set_defaults(execute=self.validation_function)
