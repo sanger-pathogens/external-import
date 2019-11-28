@@ -70,6 +70,17 @@ class TestLoader(unittest.TestCase):
         actual = loader.load()
         self.assertSpreadsheet(expected, actual)
 
+    def test_no_filename_only_run_accession(self):
+        loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_run_accession.xls'))
+
+        expected = Spreadsheet.new_instance("MyStudy", [
+            self._raw_read('PAIR1_1.fastq.gz', 'PAIR1_2.fastq.gz', 'SAMPLE1', 'LIB1', 'ACCESSION1'),
+            self._raw_read('PAIR2_1.fastq.gz', 'PAIR2_2.fastq.gz', 'SAMPLE2', 'LIB2', 'ACCESSION2')],
+                                            contact="Some Name", organisation="ENA", supplier='ENA',
+                                            technology='Illumina', size=123456.0, accession='accession',
+                                            limit='30/09/2020')
+        actual = loader.load()
+        self.assertSpreadsheet(expected, actual)
 
     def assertSpreadsheet(self, expected, actual):
         self.maxDiff = None
