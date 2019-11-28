@@ -39,9 +39,11 @@ class SpreadsheetLoader:
                 break
 
         for i in range(self._sheet.ncols):
+            filename_column = None
+            run_accession_column = None
             if self._sheet.cell_value(header_row, i) == 'Filename':
                 filename_column = i
-            elif self._sheet.cell_value(header_row, i) == 'Run accession':
+            elif self._sheet.cell_value(header_row, i) == 'Run Accession':
                 run_accession_column = i
             if filename_column is not None:
                 if self._sheet.cell_value(header_row, i) == 'Mate File':
