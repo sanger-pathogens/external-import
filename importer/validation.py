@@ -5,15 +5,18 @@ from typing import List
 from importer.model import Spreadsheet, RawRead
 
 
-def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool):
+def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool, download_reads_from_ENA: bool):
     results = []
-    validators = [validate_study_name,
-                  validate_mandatory_read_fields,
-                  validate_files_are_compressed,
-                  validate_pair_naming_convention,
-                  validate_uniqueness_of_reads,
-                  validate_no_path_in_filename,
-                  ]
+    if download_reads_from_ENA:
+        validators = [validate_study_name] #NEED MORE VALIDATORS
+    else:
+        validators = [validate_study_name,
+                      validate_mandatory_read_fields,
+                      validate_files_are_compressed,
+                      validate_pair_naming_convention,
+                      validate_uniqueness_of_reads,
+                      validate_no_path_in_filename,
+                      ]
     if part_of_internal_study:
         validators.append(validate_external_data_part_of_internal_sequencing_study_name)
     for validator in validators:

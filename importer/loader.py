@@ -70,13 +70,22 @@ class SpreadsheetLoader:
                     self.__extract_float_value(i, taxon_id_column),
                     library_name))
             if run_accession_column is not None:
-                reads.append(RawRead(
-                    (self.__extract_text_value(i, run_accession_column)+'_1.fastq.gz'),
-                    (self.__extract_text_value(i, run_accession_column)+'_2.fastq.gz'),
-                    sample_name,
-                    self.__extract_text_value(i, sample_accession_column),
-                    self.__extract_float_value(i, taxon_id_column),
-                    library_name))
+                if arguments.single-ended==True:
+                    reads.append(RawRead(
+                        (self.__extract_text_value(i, run_accession_column) + '_1.fastq.gz'),
+                        '',
+                        sample_name,
+                        self.__extract_text_value(i, sample_accession_column),
+                        self.__extract_float_value(i, taxon_id_column),
+                        library_name))
+                else:
+                    reads.append(RawRead(
+                        (self.__extract_text_value(i, run_accession_column)+'_1.fastq.gz'),
+                        (self.__extract_text_value(i, run_accession_column)+'_2.fastq.gz'),
+                        sample_name,
+                        self.__extract_text_value(i, sample_accession_column),
+                        self.__extract_float_value(i, taxon_id_column),
+                        library_name))
         result.reads = reads
         return result
 

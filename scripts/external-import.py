@@ -15,7 +15,7 @@ from importer.writer import Preparation, \
 def validate(arguments: argparse.Namespace):
     loader = SpreadsheetLoader(arguments.spreadsheet)
     sheet = loader.load()
-    result = validate_spreadsheet(sheet, arguments.part_of_internal_study)
+    result = validate_spreadsheet(sheet, arguments.part_of_internal_study, arguments.download)
     if result:
         print(result)
     else:
@@ -37,7 +37,7 @@ def prepare(arguments: argparse.Namespace):
         preparation.create_destination_directory()
         preparation.save_workbook(workbook)
         instance += 1
-    if arguments.download ==True:
+    if arguments.download:
         preparation.download_files_from_ena(connections=arguments.connections)
     else:
         preparation.copy_files(arguments.input)
