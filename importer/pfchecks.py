@@ -47,8 +47,8 @@ def __lane_names_should_be_unique_across_the_database(spreadsheet, outputdir, do
     names = []
     for read in spreadsheet.reads:
         if download_reads_from_ENA:
-            names += re.findall("^([^.]+)\\..*$", read.forward_read)
-        if read.reverse_read is None:
+            names += re.findall("^*$", read.forward_read)
+        elif read.reverse_read is None:
             print('reverse is none')
             names += re.findall("^([^.]+)\\..*$", read.forward_read)
         else:
