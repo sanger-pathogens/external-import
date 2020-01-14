@@ -43,7 +43,7 @@ class Preparation:
                     self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'], memory, df.loc[i, 'Read accession'],df.loc[i, 'Job_to_depend_on'],df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
             if i< connections:
                 df.loc[
-                    i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e -J import_%s "%s && %s"' % (
+                    i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e %s -J import_%s "%s && %s"' % (
                 self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'],
                 memory, df.loc[i, 'Read accession'], df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
         df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
