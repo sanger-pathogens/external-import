@@ -36,15 +36,16 @@ class Preparation:
                 self.destination, df.loc[i, 'Read accession'])
             df.loc[i,'extract_data_command'] = 'mv %s/%s/* %s  && rm -rf %s/%s' % (
                 self.destination, df.loc[i, 'Read accession'],self.destination, self.destination,df.loc[i, 'Read accession'])
+            memory = "-M2000 -R 'select[mem>2000] rusage[mem=2000]' "
             if i >= connections:
                 df.loc[i, 'Job_to_depend_on'] = df.loc[i - connections, 'Job_name']
-                df.loc[i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e -J import_%s -w %s "%s && %s"' % (
-                    self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'], df.loc[i, 'Read accession'],df.loc[i, 'Job_to_depend_on'],df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
+                df.loc[i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e  %s -J import_%s -w %s "%s && %s"' % (
+                    self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'], memory, df.loc[i, 'Read accession'],df.loc[i, 'Job_to_depend_on'],df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
             if i< connections:
                 df.loc[
                     i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e -J import_%s "%s && %s"' % (
                 self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'],
-                df.loc[i, 'Read accession'], df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
+                memory, df.loc[i, 'Read accession'], df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
         df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
 
     def save_workbook(self, workbook):
