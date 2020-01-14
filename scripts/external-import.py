@@ -19,7 +19,7 @@ def validate(arguments: argparse.Namespace):
     if result:
         print(result)
     else:
-        print_pf_checks(sheet, arguments.output)
+        print_pf_checks(sheet, arguments.output,arguments.download)
 
 
 def prepare(arguments: argparse.Namespace):
