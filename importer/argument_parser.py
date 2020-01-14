@@ -53,7 +53,7 @@ class ArgumentParser:
                                        default=False, help='External data part of an internally sequenced study')
         validation_parser.add_argument('-o', '--output', required=True,
                                        help='Output director for generated lane and sample files for pf')
-        group = preparation_parser.add_mutually_exclusive_group(required=True)
+        group = validation_parser.add_mutually_exclusive_group(required=True)
         group.add_argument('-cp', '--input', help='Spreadsheet is prepared to copy reads from existing files.')
         group.add_argument('-dl', '--download', help='Spreadsheet is prepared to download reads from ENA',
                            action='store_true')

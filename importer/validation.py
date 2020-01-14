@@ -8,7 +8,11 @@ from importer.model import Spreadsheet, RawRead
 def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool, download_reads_from_ENA: bool):
     results = []
     if download_reads_from_ENA:
-        validators = [validate_study_name] #NEED MORE VALIDATORS
+        validators = [validate_study_name,
+                      validate_mandatory_read_fields,
+                      validate_uniqueness_of_reads,
+                      validate_no_path_in_filename
+                      ]
     else:
         validators = [validate_study_name,
                       validate_mandatory_read_fields,
@@ -93,12 +97,12 @@ def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
         sample_name[read.sample_name] += 1
         library_name[read.library_name] += 1
 
-    invalid_forwad_read = ["Forward read is not unique: %s" % k for k, v in forward_read.items() if v > 1]
+    invalid_forward_read = ["Forward read is not unique: %s" % k for k, v in forward_read.items() if v > 1]
     invalid_reverse_read = ["Reverse read is not unique: %s" % k for k, v in reverse_read.items() if v > 1]
     invalid_sample_name = ["Sample name is not unique: %s" % k for k, v in sample_name.items() if v > 1]
     invalid_library_name = ["Library name is not unique: %s" % k for k, v in library_name.items() if v > 1]
 
-    return invalid_forwad_read + invalid_reverse_read + invalid_sample_name + invalid_library_name;
+    return invalid_forward_read + invalid_reverse_read + invalid_sample_name + invalid_library_name;
 
 
 def validate_no_path_in_filename(spreadsheet: Spreadsheet) -> List[str]:
