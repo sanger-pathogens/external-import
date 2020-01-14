@@ -46,9 +46,8 @@ pf data -t file --file-id-type sample -i %s
 def __lane_names_should_be_unique_across_the_database(spreadsheet, outputdir, download_reads_from_ENA: bool):
     names = []
     for read in spreadsheet.reads:
-        print(read.forward_read)
         if download_reads_from_ENA:
-            print('')
+            print(read.forward_read)
             #names += re.findall("^*$", read.forward_read)
         elif read.reverse_read is None:
             names += re.findall("^([^.]+)\\..*$", read.forward_read)
