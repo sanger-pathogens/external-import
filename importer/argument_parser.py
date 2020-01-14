@@ -37,7 +37,7 @@ class ArgumentParser:
         group = preparation_parser.add_mutually_exclusive_group(required=True)
         group.add_argument('-i', '--input', help='Directory containing the read files to be copied.')
         group.add_argument('-dl', '--download', help='Use this flag to download the fastq files from ENA', action='store_true')
-        group2 = parser.add_mutually_exclusive_group(required=True)
+        group2 = preparation_parser.add_mutually_exclusive_group(required=True)
         group2.add_argument('--single-ended', help='Use this flag for single-ended reads', action='store_true')
         group2.add_argument('--double-ended', help='Use this flag for double-ended reads')
         preparation_parser.add_argument('-c', '--connections', type=int, choices=range(1,100), default=10, metavar='range[1,1000]',
