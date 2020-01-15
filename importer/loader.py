@@ -5,7 +5,8 @@ from importer.model import Spreadsheet, RawRead
 
 class SpreadsheetLoader:
 
-    def __init__(self, file):
+    def __init__(self, file, single-ended):
+        self.single-ended = single-ended
         self._file = file
         self._workbook = xlrd.open_workbook(self._file)
         self._sheet = self._workbook.sheet_by_index(0)
@@ -70,7 +71,7 @@ class SpreadsheetLoader:
                     self.__extract_float_value(i, taxon_id_column),
                     library_name))
             if run_accession_column is not None:
-                if arguments.single-ended==True:
+                if self.single-ended==True:
                     reads.append(RawRead(
                         (self.__extract_text_value(i, run_accession_column) + '_1.fastq.gz'),
                         '',

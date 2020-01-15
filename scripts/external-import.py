@@ -23,7 +23,7 @@ def validate(arguments: argparse.Namespace):
 
 
 def prepare(arguments: argparse.Namespace):
-    loader = SpreadsheetLoader(arguments.spreadsheet)
+    loader = SpreadsheetLoader(arguments.spreadsheet, arguments.single-ended)
     sheet = loader.load()
 
     ### Run iterable for length of reads from here
