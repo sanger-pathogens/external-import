@@ -32,21 +32,35 @@ class Preparation:
         df = pd.DataFrame(([read.forward_read, 'import_%s' % read.forward_read] for read in self.spreadsheet.reads),
                           columns=('Read accession', 'Job_name'))
         for i in range(len(df)):
-            df.loc[i,'enaDataGet_command'] = '/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s' % (
-                self.destination, df.loc[i, 'Read accession'])
-            df.loc[i,'extract_data_command'] = 'mv %s/%s/* %s  && rm -rf %s/%s' % (
-                self.destination, df.loc[i, 'Read accession'],self.destination, self.destination,df.loc[i, 'Read accession'])
-            memory = "-M2000 -R 'select[mem>2000] rusage[mem=2000]' "
-            if i >= connections:
-                df.loc[i, 'Job_to_depend_on'] = df.loc[i - connections, 'Job_name']
-                df.loc[i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e  %s -J import_%s -w %s "%s && %s"' % (
-                    self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'], memory, df.loc[i, 'Read accession'],df.loc[i, 'Job_to_depend_on'],df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
-            if i< connections:
-                df.loc[
-                    i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e %s -J import_%s "%s && %s"' % (
-                self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'],
-                memory, df.loc[i, 'Read accession'], df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
+                if self.check_if_file_downloaded(df.loc[i, 'Read accession']) == 'unknown':
+                df.loc[i,'enaDataGet_command'] = '/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s' % (
+                    self.destination, df.loc[i, 'Read accession'])
+                df.loc[i,'extract_data_command'] = 'mv %s/%s/* %s  && rm -rf %s/%s' % (
+                    self.destination, df.loc[i, 'Read accession'],self.destination, self.destination,df.loc[i, 'Read accession'])
+                memory = "-M2000 -R 'select[mem>2000] rusage[mem=2000]' "
+                if i >= connections:
+                    df.loc[i, 'Job_to_depend_on'] = df.loc[i - connections, 'Job_name']
+                    df.loc[i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e  %s -J import_%s -w %s "%s && %s"' % (
+                        self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'], memory, df.loc[i, 'Read accession'],df.loc[i, 'Job_to_depend_on'],df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
+                if i< connections:
+                    df.loc[
+                        i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e %s -J import_%s "%s && %s"' % (
+                    self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'],
+                    memory, df.loc[i, 'Read accession'], df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
         df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
+
+    def check_if_file_downloaded(self, accession):
+        single_ended_file = self.destination + '/' + accession
+        forward_file= self.destination + '/' +  accession + '_1.fastq.gz'
+        reverse_file= self.destination + '/' + accession + '_2.fastq.gz'
+        if os.path.exists(single_ended_file) is not False:
+            return 'single'
+        elif os.path.exists(forward_file) is not False:
+            if os.path.exists(reverse_file) is not False:
+                return 'double'
+        else:
+            return 'unknown'
+
 
     def save_workbook(self, workbook):
         workbook.save(self.spreadsheet_file)
