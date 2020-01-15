@@ -32,7 +32,7 @@ def prepare(arguments: argparse.Namespace):
     current_position = 0
     while file_ended == False:
         generator = OutputSpreadsheetGenerator(sheet, current_position)
-        workbook, file_ended, current_position = generator.build(arguments.breakpoint)
+        workbook, file_ended, current_position = generator.build(arguments.breakpoint, arguments.download)
         preparation = Preparation.new_instance(sheet, arguments.output, arguments.ticket, instance)
         preparation.create_destination_directory()
         preparation.save_workbook(workbook)

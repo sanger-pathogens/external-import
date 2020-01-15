@@ -64,10 +64,10 @@ class OutputSpreadsheetGenerator:
         self.workbook = xlwt.Workbook()
         self.sheet = self.workbook.add_sheet('Sheet1')
 
-    def build(self, breakpoint: int):
+    def build(self, breakpoint: int, download):
         self.build_import_info()
         self.build_read_headers()
-        self.build_read_data(breakpoint if breakpoint > 0 else sys.maxsize)
+        self.build_read_data(breakpoint if breakpoint > 0 else sys.maxsize, download)
         return self.workbook, self.status_closed, self.row
 
     def build_import_info(self):
@@ -81,7 +81,7 @@ class OutputSpreadsheetGenerator:
         self.write_string(6, 'Total size of files in GBytes', self.spreadsheet.size)
         self.write_string(7, 'Data to be kept until', self.spreadsheet.limit)
 
-    def build_read_data(self, breakpoint: int):
+    def build_read_data(self, breakpoint: int, download):
         for read in range(breakpoint):
             position = read + 10
             end_reached = self.row == len(self.spreadsheet.reads)
@@ -89,9 +89,15 @@ class OutputSpreadsheetGenerator:
                 self.status_closed = True
                 break
             current_row = self.spreadsheet.reads[self.row]
-            self.sheet.write(position, 0, current_row.forward_read)
-            if current_row.reverse_read is not None:
-                self.sheet.write(position, 1, current_row.reverse_read)
+            if download:
+                forward_read_file = current_row.forward_read + '_1.fastq.gz'
+                reverse_read_file = current_row.forward_read + '_2.fastq.gz'
+                self.sheet.write(position, 0, forward_read_file)
+                self.sheet.write(position, 1, reverse_read_file)
+            else:
+                self.sheet.write(position, 0, current_row.forward_read)
+                if current_row.reverse_read is not None:
+                    self.sheet.write(position, 1, current_row.reverse_read)
             self.sheet.write(position, 2, current_row.sample_name)
             self.sheet.write(position, 4, current_row.taxon_id)
             self.sheet.write(position, 5, current_row.library_name)
