@@ -32,7 +32,7 @@ class Preparation:
         df = pd.DataFrame(([read.forward_read, 'import_%s' % read.forward_read] for read in self.spreadsheet.reads),
                           columns=('Read accession', 'Job_name'))
         for i in range(len(df)):
-                if self.check_if_file_downloaded(df.loc[i, 'Read accession']) == 'unknown':
+            if self.check_if_file_downloaded(df.loc[i, 'Read accession']) == 'unknown':
                 df.loc[i,'enaDataGet_command'] = '/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s' % (
                     self.destination, df.loc[i, 'Read accession'])
                 df.loc[i,'extract_data_command'] = 'mv %s/%s/* %s  && rm -rf %s/%s' % (
