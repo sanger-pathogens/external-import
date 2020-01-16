@@ -5,14 +5,14 @@ from typing import List
 from importer.model import Spreadsheet, RawRead
 
 
-def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool, download_reads_from_ENA: bool):
+def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool, download_reads_from_ena: bool):
     results = []
     validators = [validate_study_name,
                   validate_mandatory_read_fields,
-                  validate_uniqueness_of_reads(download_reads_from_ENA),
+                  validate_uniqueness_of_reads(download_reads_from_ena),
                   validate_no_path_in_filename
                   ]
-    if not download_reads_from_ENA:
+    if not download_reads_from_ena:
         validators.append(validate_files_are_compressed, validate_pair_naming_convention)
     if part_of_internal_study:
         validators.append(validate_external_data_part_of_internal_sequencing_study_name)
@@ -78,7 +78,7 @@ def __validate_pair_naming_convention_for_read(read: RawRead) -> List[str]:
     return result
 
 
-def validate_uniqueness_of_reads(spreadsheet: Spreadsheet, download) -> List[str]:
+def validate_uniqueness_of_reads(download, spreadsheet: Spreadsheet) -> List[str]:
     forward_read = defaultdict(int)
     reverse_read = defaultdict(int)
     sample_name = defaultdict(int)
