@@ -12,8 +12,6 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
                   validate_uniqueness_of_reads,
                   validate_no_path_in_filename
                   ]
-    if download_reads_from_ena:
-        validators.append(check_second_column_is_empty)
     if not download_reads_from_ena:
         validators.append(validate_files_are_compressed, validate_pair_naming_convention)
     if part_of_internal_study:
@@ -78,11 +76,6 @@ def __validate_pair_naming_convention_for_read(read: RawRead) -> List[str]:
     if read.reverse_read is not None and read.reverse_read.replace("_2.", "_1.") != read.forward_read:
         result.append("Inconsistent naming convention of forward and reverse reads for %s" % str(read))
     return result
-
-def check_second_column_is_empty(spreadsheet: Spreadsheet) -> List[str]:
-    for read in spreadsheet.reads:
-        if read.reverse_read is not None:
-            none=1
 
 def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     forward_read = defaultdict(int)
