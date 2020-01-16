@@ -9,7 +9,7 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
     results = []
     validators = [validate_study_name,
                   validate_mandatory_read_fields,
-                  validate_uniqueness_of_reads(download_reads_from_ena, spreadsheet: Spreadsheet),
+                  validate_uniqueness_of_reads,
                   validate_no_path_in_filename
                   ]
     if not download_reads_from_ena:
@@ -78,16 +78,16 @@ def __validate_pair_naming_convention_for_read(read: RawRead) -> List[str]:
     return result
 
 
-def validate_uniqueness_of_reads(download, spreadsheet: Spreadsheet) -> List[str]:
+def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     forward_read = defaultdict(int)
     reverse_read = defaultdict(int)
     sample_name = defaultdict(int)
     library_name = defaultdict(int)
     for read in spreadsheet.reads:
         forward_read[read.forward_read] += 1
-        if not download:
-            if read.reverse_read is not None:
-                reverse_read[read.reverse_read] += 1
+        if read.reverse_read is not None:
+            print(read.reverse_read)
+            reverse_read[read.reverse_read] += 1
         sample_name[read.sample_name] += 1
         library_name[read.library_name] += 1
 
