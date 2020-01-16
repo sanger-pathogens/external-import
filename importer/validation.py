@@ -14,6 +14,8 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
                   ]
     if not download_reads_from_ena:
         validators.append(validate_files_are_compressed, validate_pair_naming_convention)
+    else:
+        validators.append(check_second_column_is_empty)
     if part_of_internal_study:
         validators.append(validate_external_data_part_of_internal_sequencing_study_name)
     for validator in validators:
@@ -77,6 +79,15 @@ def __validate_pair_naming_convention_for_read(read: RawRead) -> List[str]:
         result.append("Inconsistent naming convention of forward and reverse reads for %s" % str(read))
     return result
 
+
+def check_second_column_is_empty(spreadsheet: Spreadsheet) -> List[str]:
+    filled_columns = []
+    for read in spreadsheet:
+        if read.reverse_read is not None and read.reverse_read is not '':
+            filled_columns.append("Second column is not empty: %s" % read.reverse_read)
+    return filled_columns
+
+
 def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     forward_read = defaultdict(int)
     reverse_read = defaultdict(int)
@@ -85,7 +96,6 @@ def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     for read in spreadsheet.reads:
         forward_read[read.forward_read] += 1
         if read.reverse_read is not None and read.reverse_read is not '':
-            print('still in loop')
             reverse_read[read.reverse_read] += 1
         sample_name[read.sample_name] += 1
         library_name[read.library_name] += 1
