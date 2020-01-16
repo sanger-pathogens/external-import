@@ -84,6 +84,8 @@ def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     library_name = defaultdict(int)
     for read in spreadsheet.reads:
         forward_read[read.forward_read] += 1
+        if read.reverse_read is '':
+            print('yes')
         if read.reverse_read is not None or read.reverse_read is not '':
             print('still in loop')
             reverse_read[read.reverse_read] += 1
