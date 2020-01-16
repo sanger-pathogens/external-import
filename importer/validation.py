@@ -83,7 +83,8 @@ def check_second_column_is_empty(spreadsheet: Spreadsheet) -> List[str]:
     for read in spreadsheet.reads:
         if read.reverse_read is not None:
             #print(re.search('[a-zA-Z]', read.reverse_read))
-            print(re.search('', read.reverse_read))
+            if read.reverse_read is '':
+                print('yes')
 
 def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     forward_read = defaultdict(int)
