@@ -9,7 +9,7 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
     results = []
     validators = [validate_study_name,
                   validate_mandatory_read_fields,
-                  validate_uniqueness_of_reads(download_reads_from_ena),
+                  validate_uniqueness_of_reads(download_reads_from_ena, spreadsheet),
                   validate_no_path_in_filename
                   ]
     if not download_reads_from_ena:
