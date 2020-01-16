@@ -23,7 +23,7 @@ def validate(arguments: argparse.Namespace):
 
 
 def prepare(arguments: argparse.Namespace):
-    loader = SpreadsheetLoader(arguments.spreadsheet, arguments.single-ended)
+    loader = SpreadsheetLoader(arguments.spreadsheet)
     sheet = loader.load()
 
     ### Run iterable for length of reads from here
@@ -39,6 +39,7 @@ def prepare(arguments: argparse.Namespace):
         instance += 1
     if arguments.download:
         preparation.download_files_from_ena(connections=arguments.connections)
+        #FUNCTION TO CHECK WHAT WAS DOWNLOADED AND CHANGE SPREADSHEET
     else:
         preparation.copy_files(arguments.input)
 

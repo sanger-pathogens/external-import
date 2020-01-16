@@ -5,8 +5,7 @@ from importer.model import Spreadsheet, RawRead
 
 class SpreadsheetLoader:
 
-    def __init__(self, file, single-ended):
-        self.single-ended = single-ended
+    def __init__(self, file):
         self._file = file
         self._workbook = xlrd.open_workbook(self._file)
         self._sheet = self._workbook.sheet_by_index(0)
@@ -71,23 +70,15 @@ class SpreadsheetLoader:
                     self.__extract_float_value(i, taxon_id_column),
                     library_name))
             if run_accession_column is not None:
-                if self.single-ended==True:
-                    reads.append(RawRead(
-                        (self.__extract_text_value(i, run_accession_column) + '_1.fastq.gz'),
-                        '',
-                        sample_name,
-                        self.__extract_text_value(i, sample_accession_column),
-                        self.__extract_float_value(i, taxon_id_column),
-                        library_name))
-                else:
-                    reads.append(RawRead(
-                        (self.__extract_text_value(i, run_accession_column)+'_1.fastq.gz'),
-                        (self.__extract_text_value(i, run_accession_column)+'_2.fastq.gz'),
-                        sample_name,
-                        self.__extract_text_value(i, sample_accession_column),
-                        self.__extract_float_value(i, taxon_id_column),
-                        library_name))
+                reads.append(RawRead(
+                    (self.__extract_text_value(i, run_accession_column)),
+                    '',
+                    sample_name,
+                    self.__extract_text_value(i, sample_accession_column),
+                    self.__extract_float_value(i, taxon_id_column),
+                    library_name))
         result.reads = reads
+        #NEED FUNCTION TO CHECK WHAT IS DOWNLOADED AND ALTER SPREADSHEET
         return result
 
     def __extract_text_value(self, row, column):

@@ -104,6 +104,7 @@ class OutputSpreadsheetGenerator:
                 break
             current_row = self.spreadsheet.reads[self.row]
             if download:
+                #CHECK WHAT WAS DOWNLOADED
                 forward_read_file = current_row.forward_read + '_1.fastq.gz'
                 reverse_read_file = current_row.forward_read + '_2.fastq.gz'
                 self.sheet.write(position, 0, forward_read_file)
