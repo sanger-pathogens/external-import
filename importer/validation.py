@@ -13,7 +13,7 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
                   validate_no_path_in_filename
                   ]
     if download_reads_from_ena:
-        validators.append(check_second_colum_is_empty)
+        validators.append(check_second_column_is_empty)
     if not download_reads_from_ena:
         validators.append(validate_files_are_compressed, validate_pair_naming_convention)
     if part_of_internal_study:
