@@ -82,9 +82,7 @@ def __validate_pair_naming_convention_for_read(read: RawRead) -> List[str]:
 def check_second_column_is_empty(spreadsheet: Spreadsheet) -> List[str]:
     for read in spreadsheet.reads:
         if read.reverse_read is not None:
-            #print(re.search('[a-zA-Z]', read.reverse_read))
-            if read.reverse_read is '':
-                print(read.reverse_read.strip(''))
+            none=1
 
 def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     forward_read = defaultdict(int)
@@ -93,7 +91,8 @@ def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     library_name = defaultdict(int)
     for read in spreadsheet.reads:
         forward_read[read.forward_read] += 1
-        if read.reverse_read is not None or read.reverse_read is not ( ):
+        if read.reverse_read is not None or read.reverse_read is not '':
+            print('still in loop')
             reverse_read[read.reverse_read] += 1
         sample_name[read.sample_name] += 1
         library_name[read.library_name] += 1
