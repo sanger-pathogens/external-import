@@ -53,10 +53,10 @@ class Preparation:
         single_ended_file = self.destination + '/' + accession
         forward_file= self.destination + '/' +  accession + '_1.fastq.gz'
         reverse_file= self.destination + '/' + accession + '_2.fastq.gz'
-        if os.path.exists(single_ended_file) is not False:
+        if path.exists(single_ended_file) is not False:
             return 'single'
-        elif os.path.exists(forward_file) is not False:
-            if os.path.exists(reverse_file) is not False:
+        elif path.exists(forward_file) is not False:
+            if path.exists(reverse_file) is not False:
                 return 'double'
         else:
             return 'unknown'
