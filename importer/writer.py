@@ -30,7 +30,6 @@ class Preparation:
 
     def download_files_from_ena(self,connections):
         reads_to_download=[read.forward_read for read in self.spreadsheet.reads if self.check_if_file_downloaded(read.forward_read) == 'unknown']
-        print(reads_to_download)
         df = pd.DataFrame(([read, 'import_%s' % read] for read in reads_to_download),
                           columns=('Read accession', 'Job_name'))
         for i in range(len(df)):
