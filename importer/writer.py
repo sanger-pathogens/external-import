@@ -29,8 +29,11 @@ class Preparation:
                 copyfile("%s/%s" % (source, read.reverse_read), "%s/%s" % (self.destination, read.reverse_read))
 
     def download_files_from_ena(self,connections):
-        df = pd.DataFrame(([read.forward_read, 'import_%s' % read.forward_read] for read in self.spreadsheet.reads),
+        reads_to_download=[read.forward_read for read in self.spreadsheet.reads if self.check_if_file_downloaded(read.forward_read) == 'unknown']
+        print(reads_to_download)
+        df = pd.DataFrame(([read, 'import_%s' % read] for read in reads_to_download),
                           columns=('Read accession', 'Job_name'))
+        print(df)
         for i in range(len(df)-1):
             if self.check_if_file_downloaded(df.loc[i, 'Read accession']) == 'unknown':
                 df.loc[i,'enaDataGet_command'] = '/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s' % (
