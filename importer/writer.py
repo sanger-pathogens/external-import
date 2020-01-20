@@ -51,6 +51,7 @@ class Preparation:
                         i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e %s -J import_%s "%s && %s"' % (
                     self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'],
                     memory, df.loc[i, 'Read accession'], df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
+        print(5)
         df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
 
     def check_if_file_downloaded(self, accession):
