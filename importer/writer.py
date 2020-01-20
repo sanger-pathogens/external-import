@@ -51,7 +51,10 @@ class Preparation:
                     self.destination, df.loc[i, 'Read accession'], self.destination, df.loc[i, 'Read accession'],
                     memory, df.loc[i, 'Read accession'], df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
         df = df[pd.notnull(df['Command'])]
-        df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
+        if len(df) !=0:
+            df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
+        else:
+            print ('No new files found to be downloaded')
 
     def check_if_file_downloaded(self, accession):
         single_ended_file = self.destination + '/' + accession + '.fastq.gz'
