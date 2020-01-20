@@ -32,7 +32,6 @@ class Preparation:
         #if read.reverse_read is not None and read.reverse_read is not '':
         df = pd.DataFrame(([read.forward_read, 'import_%s' % read.forward_read] for read in self.spreadsheet.reads),
                           columns=('Read accession', 'Job_name'))
-        print(df)
         for i in range(len(df)):
             print(i)
             if self.check_if_file_downloaded(df.loc[i, 'Read accession']) == 'unknown':
