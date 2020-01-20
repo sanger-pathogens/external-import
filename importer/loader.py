@@ -48,6 +48,7 @@ class SpreadsheetLoader:
                 if self._sheet.cell_value(header_row, i) == 'Mate File':
                     mate_filename_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Name':
+                print('Sample name filled in')
                 sample_name_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Accession number':
                 sample_accession_column = i
