@@ -29,7 +29,6 @@ class Preparation:
                 copyfile("%s/%s" % (source, read.reverse_read), "%s/%s" % (self.destination, read.reverse_read))
 
     def download_files_from_ena(self,connections):
-        #if read.reverse_read is not None and read.reverse_read is not '':
         df = pd.DataFrame(([read.forward_read, 'import_%s' % read.forward_read] for read in self.spreadsheet.reads),
                           columns=('Read accession', 'Job_name'))
         for i in range(len(df)-1):
@@ -57,8 +56,7 @@ class Preparation:
         reverse_file= self.destination + '/' + accession + '_2.fastq.gz'
         if path.exists(single_ended_file) is not False:
             return 'single'
-        elif path.exists(forward_file) is not False:
-            if path.exists(reverse_file) is not False:
+        elif path.exists(forward_file) is not False and path.exists(reverse_file) is not False:
                 return 'double'
         else:
             return 'unknown'
