@@ -33,7 +33,7 @@ class Preparation:
         df = pd.DataFrame(([read, 'import_%s' % read] for read in reads_to_download),
                           columns=('Read accession', 'Job_name'))
         for i in range(len(df)):
-            if self.check_if_file_downloaded(df.loc[i, 'Read accession']) == 'unknown':
+            if not self.check_if_file_downloaded(df.loc[i, 'Read accession']):
                 df.loc[i,'enaDataGet_command'] = '/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s' % (
                     self.destination, df.loc[i, 'Read accession'])
                 df.loc[i,'extract_data_command'] = 'mv %s/%s/* %s  && rm -rf %s/%s' % (
@@ -58,11 +58,11 @@ class Preparation:
         forward_file= self.destination + '/' +  accession + '_1.fastq.gz'
         reverse_file= self.destination + '/' + accession + '_2.fastq.gz'
         if path.exists(single_ended_file) is not False:
-            return 'single'
+            return True
         elif path.exists(forward_file) is not False and path.exists(reverse_file) is not False:
-                return 'double'
+                return True
         else:
-            return 'unknown'
+            return False
 
 
     def save_workbook(self, workbook):
@@ -98,6 +98,7 @@ class OutputSpreadsheetGenerator:
         self.write_string(6, 'Total size of files in GBytes', self.spreadsheet.size)
         self.write_string(7, 'Data to be kept until', self.spreadsheet.limit)
 
+
     def build_read_data(self, breakpoint: int, download):
         for read in range(breakpoint):
             position = read + 10
@@ -108,9 +109,10 @@ class OutputSpreadsheetGenerator:
             current_row = self.spreadsheet.reads[self.row]
             if download:
                 forward_read_file = current_row.forward_read + '_1.fastq.gz'
-                reverse_read_file = current_row.forward_read + '_2.fastq.gz'
                 self.sheet.write(position, 0, forward_read_file)
-                self.sheet.write(position, 1, reverse_read_file)
+                if current_row.reverse_read :
+                    reverse_read_file = current_row.forward_read + '_2.fastq.gz'
+                    self.sheet.write(position, 1, reverse_read_file)
             else:
                 self.sheet.write(position, 0, current_row.forward_read)
                 if current_row.reverse_read is not None:

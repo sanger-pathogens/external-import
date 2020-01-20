@@ -47,6 +47,9 @@ class SpreadsheetLoader:
             if filename_column is not None:
                 if self._sheet.cell_value(header_row, i) == 'Mate File':
                     mate_filename_column = i
+            if run_accession_column is not None:
+                if self._sheet.cell_value(header_row, i) == 'Double-ended Reads':
+                    double_ended_reads_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Name':
                 sample_name_column = i
             if self._sheet.cell_value(header_row, i) == 'Sample Accession number':
@@ -72,13 +75,12 @@ class SpreadsheetLoader:
             if run_accession_column is not None:
                 reads.append(RawRead(
                     (self.__extract_text_value(i, run_accession_column)),
-                    '',
+                    self.__extract_text_value(i, double_ended_reads_column),
                     sample_name,
                     self.__extract_text_value(i, sample_accession_column),
                     self.__extract_float_value(i, taxon_id_column),
                     library_name))
         result.reads = reads
-        #NEED FUNCTION TO CHECK WHAT IS DOWNLOADED AND ALTER SPREADSHEET
         return result
 
     def __extract_text_value(self, row, column):

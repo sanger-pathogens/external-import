@@ -15,7 +15,7 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
     if not download_reads_from_ena:
         validators.append(validate_files_are_compressed, validate_pair_naming_convention)
     else:
-        validators.append(check_second_column_is_empty)
+        validators.append(check_double_ended_column_is_bool)
     if part_of_internal_study:
         validators.append(validate_external_data_part_of_internal_sequencing_study_name)
     for validator in validators:
@@ -80,12 +80,12 @@ def __validate_pair_naming_convention_for_read(read: RawRead) -> List[str]:
     return result
 
 
-def check_second_column_is_empty(spreadsheet: Spreadsheet) -> List[str]:
-    filled_columns = []
+def check_double_ended_column_is_bool(spreadsheet: Spreadsheet) -> List[str]:
+    result = []
     for read in spreadsheet.reads:
-        if read.reverse_read is not None and read.reverse_read is not '':
-            filled_columns.append("Second column is not empty: %s" % read.reverse_read)
-    return filled_columns
+        if read.reverse_read is not bool:
+            result.append("If this read is double-ended is missing, must be True or False")
+    return result
 
 
 def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
