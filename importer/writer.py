@@ -34,6 +34,7 @@ class Preparation:
                           columns=('Read accession', 'Job_name'))
         print(df)
         for i in range(len(df)):
+            print(i)
             if self.check_if_file_downloaded(df.loc[i, 'Read accession']) == 'unknown':
                 df.loc[i,'enaDataGet_command'] = '/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s' % (
                     self.destination, df.loc[i, 'Read accession'])
