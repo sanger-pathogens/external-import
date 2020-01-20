@@ -84,7 +84,6 @@ class SpreadsheetLoader:
         return result
 
     def __extract_text_value(self, row, column):
-        print(self._sheet.cell_value(row, column))
         new_data = self._sheet.cell_value(row, column).strip()
         return None if new_data == '' else new_data
 
