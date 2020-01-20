@@ -32,11 +32,8 @@ class Preparation:
         #if read.reverse_read is not None and read.reverse_read is not '':
         df = pd.DataFrame(([read.forward_read, 'import_%s' % read.forward_read] for read in self.spreadsheet.reads),
                           columns=('Read accession', 'Job_name'))
-        print('1')
         for i in range(len(df)-1):
-            print('2')
             if self.check_if_file_downloaded(df.loc[i, 'Read accession']) == 'unknown':
-                print('3')
                 df.loc[i,'enaDataGet_command'] = '/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s' % (
                     self.destination, df.loc[i, 'Read accession'])
                 df.loc[i,'extract_data_command'] = 'mv %s/%s/* %s  && rm -rf %s/%s' % (
@@ -55,7 +52,6 @@ class Preparation:
         df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
 
     def check_if_file_downloaded(self, accession):
-        print('4')
         single_ended_file = self.destination + '/' + accession + '.fastq.gz'
         forward_file= self.destination + '/' +  accession + '_1.fastq.gz'
         reverse_file= self.destination + '/' + accession + '_2.fastq.gz'
