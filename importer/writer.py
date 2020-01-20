@@ -51,7 +51,7 @@ class Preparation:
         df['download_return_code'] = df['Command'].apply(lambda x: runrealcmd(x))
 
     def check_if_file_downloaded(self, accession):
-        single_ended_file = self.destination + '/' + accession
+        single_ended_file = self.destination + '/' + accession + '.fastq.gz'
         forward_file= self.destination + '/' +  accession + '_1.fastq.gz'
         reverse_file= self.destination + '/' + accession + '_2.fastq.gz'
         if path.exists(single_ended_file) is not False:
