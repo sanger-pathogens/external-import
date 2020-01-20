@@ -30,6 +30,11 @@ def prepare(arguments: argparse.Namespace):
     file_ended = False
     instance = 0
     current_position = 0
+    preparation = Preparation.new_instance(sheet, arguments.output, arguments.ticket, instance)
+    if arguments.download:
+        preparation.download_files_from_ena(connections=arguments.connections)
+    else:
+        preparation.copy_files(arguments.input)
     while file_ended == False:
         generator = OutputSpreadsheetGenerator(sheet, current_position)
         workbook, file_ended, current_position = generator.build(arguments.breakpoint, arguments.download)
@@ -37,11 +42,6 @@ def prepare(arguments: argparse.Namespace):
         preparation.create_destination_directory()
         preparation.save_workbook(workbook)
         instance += 1
-    if arguments.download:
-        preparation.download_files_from_ena(connections=arguments.connections)
-        #FUNCTION TO CHECK WHAT WAS DOWNLOADED AND CHANGE SPREADSHEET
-    else:
-        preparation.copy_files(arguments.input)
 
 
 def load(arguments: argparse.Namespace):
