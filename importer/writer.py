@@ -110,7 +110,7 @@ class OutputSpreadsheetGenerator:
             if download:
                 forward_read_file = current_row.forward_read + '_1.fastq.gz'
                 self.sheet.write(position, 0, forward_read_file)
-                if current_row.reverse_read :
+                if current_row.reverse_read == 'T':
                     reverse_read_file = current_row.forward_read + '_2.fastq.gz'
                     self.sheet.write(position, 1, reverse_read_file)
             else:

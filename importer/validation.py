@@ -80,11 +80,11 @@ def __validate_pair_naming_convention_for_read(read: RawRead) -> List[str]:
     return result
 
 
-def check_double_ended_column_is_bool(spreadsheet: Spreadsheet) -> List[str]:
+def check_double_ended_column_is_T_or_F(spreadsheet: Spreadsheet) -> List[str]:
     result = []
     for read in spreadsheet.reads:
-        if read.reverse_read is not bool:
-            result.append("If this read is double-ended is missing, must be True or False")
+        if read.reverse_read is not 'T' and read.reverse_read is not 'F':
+            result.append("If this read is double-ended is missing, must be T or F")
     return result
 
 
