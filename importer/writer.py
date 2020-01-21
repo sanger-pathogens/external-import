@@ -29,7 +29,7 @@ class Preparation:
                 copyfile("%s/%s" % (source, read.reverse_read), "%s/%s" % (self.destination, read.reverse_read))
 
     def download_files_from_ena(self,connections):
-        reads_to_download=[read.forward_read for read in self.spreadsheet.reads if self.check_if_file_downloaded(read.forward_read) == 'unknown']
+        reads_to_download=[read.forward_read for read in self.spreadsheet.reads if not self.check_if_file_downloaded(read.forward_read)]
         df = pd.DataFrame(([read, 'import_%s' % read] for read in reads_to_download),
                           columns=('Read accession', 'Job_name'))
         for i in range(len(df)):
