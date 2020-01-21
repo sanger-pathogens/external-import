@@ -13,7 +13,8 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
                   validate_no_path_in_filename
                   ]
     if not download_reads_from_ena:
-        validators.append(validate_files_are_compressed, validate_pair_naming_convention)
+        validators.append(validate_files_are_compressed)
+        validators.append(validate_pair_naming_convention)
     else:
         validators.append(check_double_ended_column_is_T_or_F)
     if part_of_internal_study:
