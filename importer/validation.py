@@ -15,7 +15,7 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
     if not download_reads_from_ena:
         validators.append(validate_files_are_compressed, validate_pair_naming_convention)
     else:
-        validators.append(check_double_ended_column_is_bool)
+        validators.append(check_double_ended_column_is_T_or_F)
     if part_of_internal_study:
         validators.append(validate_external_data_part_of_internal_sequencing_study_name)
     for validator in validators:
