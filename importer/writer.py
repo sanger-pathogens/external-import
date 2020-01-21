@@ -30,7 +30,6 @@ class Preparation:
 
     def download_files_from_ena(self,connections):
         reads_to_download=[read.forward_read for read in self.spreadsheet.reads if not self.check_if_file_downloaded(read.forward_read)]
-        print(reads_to_download)
         df = pd.DataFrame(([read, 'import_%s' % read] for read in reads_to_download),
                           columns=('Read accession', 'Job_name'))
         for i in range(len(df)):
@@ -55,11 +54,9 @@ class Preparation:
             print ('No new files found to be downloaded')
 
     def check_if_file_downloaded(self, accession):
-        print(accession)
         single_ended_file = self.destination + '/' + accession + '.fastq.gz'
         forward_file= self.destination + '/' +  accession + '_1.fastq.gz'
         reverse_file= self.destination + '/' + accession + '_2.fastq.gz'
-        print(forward_file)
         if path.exists(single_ended_file):
             return True
         elif path.exists(forward_file) and path.exists(reverse_file):
