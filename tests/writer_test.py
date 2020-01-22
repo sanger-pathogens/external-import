@@ -52,11 +52,10 @@ class TestFileDownload(unittest.TestCase):
             RawRead(forward_read='Accession2', reverse_read=None, sample_name='SAMPLE2',
                     taxon_id='1280', library_name='LIB2', sample_accession=None)]), 'destination', 0, 0)
         under_test.download_files_from_ena(connections)
-        print(runrealcmd_patch.call_args_list)
+        print('commands',runrealcmd_patch.call_args_list)
         self.assertEqual(runrealcmd_patch.call_args_list,
-                         [call('bsub -o destination/0/Accession1.o -e destination/0/Accession1.e -J import_Accession1 "/nfs/users/nfs_k/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination/0 Accession1 && mv destination/0/Accession1/* destination/0  && rm -rf destination/0/Accession1"'),
-                          call('bsub -o destination/0/Accession2.o -e destination/0/Accession2.e -J import_Accession2 -w import_Accession1 "/nfs/users/nfs_k/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination/0 Accession2 && mv destination/0/Accession2/* destination/0  && rm -rf destination/0/Accession2"')])
-
+                        [call('bsub -o destination/0/Accession1.o -e destination/0/Accession1.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession1 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination/0 Accession1 && mv destination/0/Accession1/* destination/0  && rm -rf destination/0/Accession1"'),
+                         call('bsub -o destination/0/Accession2.o -e destination/0/Accession2.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession2 -w import_Accession1 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination/0 Accession2 && mv destination/0/Accession2/* destination/0  && rm -rf destination/0/Accession2"')])
 
 class TestXlsGeneration(unittest.TestCase):
     data_dir = os.path.dirname(os.path.abspath(__file__))
@@ -90,7 +89,7 @@ class TestXlsGeneration(unittest.TestCase):
 
     def run_function(self, sheet):
         generator = OutputSpreadsheetGenerator(sheet, A_POSITION)
-        workbook, file_ended, current_position = generator.build(A_BREAKPOINT)
+        workbook, file_ended, current_position = generator.build(A_BREAKPOINT, False)
         workbook.save('workbook.xls')
         self.assertEqual((current_position, file_ended), (2, True))
         return current_position, file_ended

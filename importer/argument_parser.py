@@ -51,7 +51,7 @@ class ArgumentParser:
         validation_parser.add_argument('-o', '--output', required=True,
                                        help='Output director for generated lane and sample files for pf')
         group = validation_parser.add_mutually_exclusive_group(required=True)
-        group.add_argument('-cp', '--input', help='Spreadsheet is prepared to copy reads from existing files.' , action='store_true')
+        group.add_argument('-cp', '--copy', help='Spreadsheet is prepared to copy reads from existing files.' , action='store_true')
         group.add_argument('-dl', '--download', help='Spreadsheet is prepared to download reads from ENA',
                            action='store_true')
         validation_parser.set_defaults(execute=self.validation_function)
