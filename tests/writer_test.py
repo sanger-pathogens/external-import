@@ -106,7 +106,7 @@ class TestFileDownload(unittest.TestCase):
 class TestCreateCommands(unittest.TestCase):
 
     def setUp(self):
-        self.ena_command_path='/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet'
+        self.ena_command_path='enaDataGet'
         self.memory= "-M2000 -R 'select[mem>2000] rusage[mem=2000]'"
         self.mv_accession1_command = 'mv destination/Accession1/* destination  && rm -rf destination/Accession1'
         self.mv_accession2_command = 'mv destination/Accession2/* destination  && rm -rf destination/Accession2'
@@ -144,7 +144,7 @@ class TestCreateCommands(unittest.TestCase):
 class TestSubmitCommands(unittest.TestCase):
 
     def setUp(self):
-        self.ena_command_path='/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet'
+        self.ena_command_path='enaDataGet'
         self.memory= "-M2000 -R 'select[mem>2000] rusage[mem=2000]'"
         self.mv_accession1_command = 'mv destination/Accession1/* destination  && rm -rf destination/Accession1'
         self.mv_accession2_command = 'mv destination/Accession2/* destination  && rm -rf destination/Accession2'
@@ -167,8 +167,8 @@ class TestSubmitCommands(unittest.TestCase):
         df = pd.DataFrame(data=d)
         submit_commands(df)
         self.assertEqual(runrealcmd_patch.call_args_list,
-                        [call('bsub -o destination/Accession1.o -e destination/Accession1.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession1 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination Accession1 && mv destination/Accession1/* destination  && rm -rf destination/Accession1"'),
-                         call('bsub -o destination/Accession2.o -e destination/Accession2.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession2 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination Accession2 && mv destination/Accession2/* destination  && rm -rf destination/Accession2"')])
+                        [call('bsub -o destination/Accession1.o -e destination/Accession1.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession1 "enaDataGet -f fastq -d destination Accession1 && mv destination/Accession1/* destination  && rm -rf destination/Accession1"'),
+                         call('bsub -o destination/Accession2.o -e destination/Accession2.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession2 "enaDataGet -f fastq -d destination Accession2 && mv destination/Accession2/* destination  && rm -rf destination/Accession2"')])
 
     @patch('importer.writer.runrealcmd')
     def test_submit_commands_with_job_dependency(self,runrealcmd_patch):
@@ -183,8 +183,8 @@ class TestSubmitCommands(unittest.TestCase):
         df = pd.DataFrame(data=d)
         submit_commands(df)
         self.assertEqual(runrealcmd_patch.call_args_list,
-                         [call('bsub -o destination/Accession1.o -e destination/Accession1.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession1 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination Accession1 && mv destination/Accession1/* destination  && rm -rf destination/Accession1"'),
-                          call('bsub -o destination/Accession2.o -e destination/Accession2.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession2 -w import_Accession1 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination Accession2 && mv destination/Accession2/* destination  && rm -rf destination/Accession2"')])
+                         [call('bsub -o destination/Accession1.o -e destination/Accession1.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession1 "enaDataGet -f fastq -d destination Accession1 && mv destination/Accession1/* destination  && rm -rf destination/Accession1"'),
+                          call('bsub -o destination/Accession2.o -e destination/Accession2.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession2 -w import_Accession1 "enaDataGet -f fastq -d destination Accession2 && mv destination/Accession2/* destination  && rm -rf destination/Accession2"')])
 
     @patch('importer.writer.runrealcmd')
     def test_submit_commands_on_df_with_no_commands(self,runrealcmd_patch):

@@ -8,7 +8,6 @@ import pandas as pd
 from importer.model import Spreadsheet
 from importer.run_bash_command import runrealcmd
 
-
 class Preparation:
 
 
@@ -61,7 +60,7 @@ class Preparation:
 
 def create_commands(df, connections, destination):
     for i in range(len(df)):
-        df.loc[i,'enaDataGet_command'] = '/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d %s %s' % (
+        df.loc[i,'enaDataGet_command'] = 'enaDataGet -f fastq -d %s %s' % (
             destination, df.loc[i, 'Read accession'])
         df.loc[i,'extract_data_command'] = 'mv %s/%s/* %s  && rm -rf %s/%s' % (
             destination, df.loc[i, 'Read accession'],destination,destination, df.loc[i, 'Read accession'])
