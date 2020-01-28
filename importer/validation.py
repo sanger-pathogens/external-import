@@ -85,7 +85,7 @@ def check_double_ended_column_is_T_or_F(spreadsheet: Spreadsheet) -> List[str]:
     result = []
     for read in spreadsheet.reads:
         if read.reverse_read is not 'T' and read.reverse_read is not 'F':
-            result.append("If this read is double-ended is missing, must be T or F")
+            result.append("Double-ended is incorrectly formatted, must be T or F")
     return result
 
 

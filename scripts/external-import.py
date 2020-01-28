@@ -3,7 +3,6 @@
 import argparse
 from sys import argv
 
-#from importer.argument_parser import ArgumentParser
 from importer.argument_parser import ArgumentParser
 from importer.importer import DataImporter
 from importer.loader import SpreadsheetLoader

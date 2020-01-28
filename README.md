@@ -14,48 +14,53 @@ A python3 library to parse external import spreadsheets
 [![Docker Pulls](https://img.shields.io/docker/pulls/sangerpathogens/seroba.svg)](https://hub.docker.com/r/sangerpathogens/seroba)  
 -->
 # WIP
-<!--
-## Contents (edit as fit)
+## Contents
   * [Introduction](#introduction)
   * [Installation](#installation)
     * [Required dependencies](#required-dependencies)
-    * [Optional dependencies](#optional-dependencies)
-    * [Linux specific instructions (Debian, Ubuntu, RedHat etc\.)](#linux-specific-instructions-debian-ubuntu-redhat-etc)
-    * [Mac OS](#mac-os)
-    * [Bioconda](#bioconda)
-    * [Homebrew/Linuxbrew](#homebrewlinuxbrew)
-    * [Docker](#docker)
-    * [Virtual Machine](#virtual-machine)
-    * [Galaxy](#galaxy)
-    * [From Source](#from-source)
-    * [Running the tests](#running-the-tests)
+    * [From Source](#running-the-tests)
+  * [Uninstallation](#from-source)
   * [Usage](#usage)
   * [License](#license)
   * [Feedback/Issues](#feedbackissues)
   * [Citation](#citation)
   * [Further Information](#further-information)
 
-## Introduction
-Provide a more in-depth overview and description of the software. A single paragraph should be sufficient.
--->
+##Introduction
+This software can be used to prepare data to be imported into the pathogen's pipelines. There are three steps to this process. 
+Validation is used to check over the manifest supplied by the user and check that the lanes have not already been imported. 
+The prepare step converts the spreadsheet supplied into the correct format. It can also split this spreadsheet if there are 
+too many lanes to be imported in one go. This step can also be run in two modes, to either copy the files to a set location 
+from a users directory, or to download the files from the ENA. The last step is to load the commands needed to import the data 
+into a bash script.  
+
 ## Installation
+There are a number of ways to install external-import and details are provided below. If you encounter an issue when installing <software name> please contact your local system administrator.
+### Required Dependencies 
+    * Python 3.6.9
+    * enaBrowserTools 1.5.4
+
+### From Source
 ```
 python3 -m venv external_import
 source external_import/bin/activate
 git clone https://github.com/sanger-pathogens/external-import
+```
+Run the tests 
+```
+python3 setup.py test
+```
+If all of the tests pass, then install 
+```
 cd external-import
 pip install .
 ```
-
 
 ## Uninstallation
 ```
 source external_import/bin/activate
 pip uninstall external-import
 ```
-
-### Running the tests
-Instructions on how to run the tests and check that the software has installed correctly.
 
 ## Usage
 ```
@@ -76,7 +81,7 @@ optional arguments:
 ### Validation
 ```
 external-import.py validate --help
-usage: external-import validate [-h] -s SPREADSHEET [-i] -o OUTPUT
+usage: external-import validate [-h] -s SPREADSHEET [-i] -o OUTPUT (-cp | -dl)
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -86,13 +91,16 @@ optional arguments:
   -o OUTPUT, --output OUTPUT
                         Output director for generated lane and sample files
                         for pf
+  -cp, --copy           Spreadsheet is prepared to copy reads from existing
+                        files.
+  -dl, --download       Spreadsheet is prepared to download reads from ENA
 ```
 
 ### Preparation
 ```
 external-import.py prepare --help
-usage: external-import prepare [-h] -s SPREADSHEET -t TICKET -i INPUT -o
-                               OUTPUT
+usage: external-import prepare [-h] -s SPREADSHEET -t TICKET (-i INPUT | -dl)
+                               [-c range[1,1000]] -o OUTPUT [-b BREAKPOINT]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -101,9 +109,17 @@ optional arguments:
   -t TICKET, --ticket TICKET
                         RT Ticket number
   -i INPUT, --input INPUT
-                        Directory containing the read files
+                        Directory containing the read files to be copied.
+  -dl, --download       Use this flag to download the fastq files from ENA
+  -c range[1,1000], --connections range[1,1000]
+                        Number of connections to ENA to be made at a time if
+                        files are to be downloaded. Default is 10.
   -o OUTPUT, --output OUTPUT
-                        Base directory for import data
+                        Base directory for import datas
+  -b BREAKPOINT, --breakpoint BREAKPOINT
+                        Breakpoint to split spreadsheet, default is no
+                        breaking
+
 ```
 Base directory for import data is ```/lustre/scratch118/infgen/pathogen/pathpipe/external_seq_data```
 
@@ -120,7 +136,7 @@ bsub -o prepare.o -e prepare.e -M2000 -R "select[mem>2000] rusage[mem=2000]" ext
 The script doesn't load the data, but rather prints the instructions to load the data.
 ```
 external-import.py load --help
-usage: external-import load [-h] -d DATABASE -t TICKET -o OUTPUT
+usage: external-import load [-h] -d DATABASE -t TICKET -o OUTPUT -c COMMANDS
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -130,6 +146,8 @@ optional arguments:
                         RT Ticket number
   -o OUTPUT, --output OUTPUT
                         Base directory for import data
+  -c COMMANDS, --commands COMMANDS
+                        Directory for command file
 ```
 <!--
 ## License

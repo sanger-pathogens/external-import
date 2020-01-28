@@ -3,7 +3,9 @@ from unittest.mock import patch, call
 import os
 import xlrd
 from importer.model import Spreadsheet, RawRead
-from importer.writer import Preparation, OutputSpreadsheetGenerator
+from importer.writer import Preparation, OutputSpreadsheetGenerator, create_commands, submit_commands
+import pandas as pd
+from testfixtures import TempDirectory
 
 AN_OUTPUT = "AN_OUTPUT"
 A_TICKET = 123
@@ -43,19 +45,153 @@ class TestFileCopy(unittest.TestCase):
 
 class TestFileDownload(unittest.TestCase):
 
-    @patch('importer.writer.runrealcmd')
-    def test_ENA_download(self, runrealcmd_patch):
-        connections=1
-        under_test = Preparation.new_instance(Spreadsheet.new_instance("MyStudy", [
-            RawRead(forward_read='Accession1', reverse_read='', sample_name='SAMPLE1',
+    def setUp(self):
+        self.tempdir = TempDirectory()
+        self.tempdir.write('1/Accession1.fastq.gz', b'the text')
+        self.tempdir.write('2/Accession1_1.fastq.gz', b'the text')
+        self.tempdir.write('2/Accession1_2.fastq.gz',b'the text')
+        self.tempdir_path = self.tempdir.path
+        print('temp',self.tempdir_path)
+        self.under_test1 = Preparation.new_instance(Spreadsheet.new_instance("MyStudy", [
+            RawRead(forward_read='Accession1', reverse_read='T', sample_name='SAMPLE1',
                     taxon_id='1280', library_name='LIB1', sample_accession=None),
-            RawRead(forward_read='Accession2', reverse_read=None, sample_name='SAMPLE2',
-                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), 'destination', 0, 0)
-        under_test.download_files_from_ena(connections)
-        print('commands',runrealcmd_patch.call_args_list)
+            RawRead(forward_read='Accession2', reverse_read='T', sample_name='SAMPLE2',
+                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), self.tempdir_path, 0, 0)
+        self.under_test2 = Preparation.new_instance(Spreadsheet.new_instance("MyStudy", [
+            RawRead(forward_read='Accession1', reverse_read='T', sample_name='SAMPLE1',
+                    taxon_id='1280', library_name='LIB1', sample_accession=None),
+            RawRead(forward_read='Accession2', reverse_read='T', sample_name='SAMPLE2',
+                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), self.tempdir_path, 1, 0)
+        self.under_test3 = Preparation.new_instance(Spreadsheet.new_instance("MyStudy", [
+            RawRead(forward_read='Accession1', reverse_read='T', sample_name='SAMPLE1',
+                    taxon_id='1280', library_name='LIB1', sample_accession=None),
+            RawRead(forward_read='Accession2', reverse_read='T', sample_name='SAMPLE2',
+                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), self.tempdir_path, 2, 0)
+
+    def tearDown(self):
+        self.tempdir.cleanup()
+        pass
+
+    def test_ENA_download_calls_create_commands_correctly(self):
+        connections=1
+        with patch("importer.writer.Preparation.create_dataframe_from_list", return_value = 'df') as mock_create_dataframe_from_list:
+            with patch("importer.writer.Preparation.check_if_file_downloaded", return_value =False) as mock_check_if_file_downloaded:
+                with patch("importer.writer.create_commands", return_value='df') as mock_create_commands:
+                    with patch("importer.writer.submit_commands") as mock_submit_commands:
+                       self.under_test1.download_files_from_ena(connections)
+        mock_create_dataframe_from_list.assert_called_once_with(['Accession1','Accession2'])
+        mock_create_commands.assert_called_once_with('df', 1, self.tempdir_path+'/0')
+        mock_submit_commands.assert_called_once_with('df')
+
+    def test_create_dataframe_from_list(self):
+        reads = ['Accession1','Accession2']
+        actual=self.under_test1.create_dataframe_from_list(reads)
+        expected = pd.DataFrame(([read, 'import_%s' % read] for read in reads),
+                          columns=('Read accession', 'Job_name'))
+        pd.testing.assert_frame_equal(actual,expected)
+
+    def test_check_if_file_downloaded_no_files(self):
+        actual=self.under_test1.check_if_file_downloaded('Accession1')
+        self.assertEqual(actual,False)
+
+    def test_check_if_file_downloaded_single_ended_exists(self):
+        actual=self.under_test2.check_if_file_downloaded('Accession1')
+        self.assertEqual(actual,True)
+
+    def test_check_if_file_downloaded_double_ended_exists(self):
+        actual=self.under_test3.check_if_file_downloaded('Accession1')
+        self.assertEqual(actual,True)
+
+
+class TestCreateCommands(unittest.TestCase):
+
+    def setUp(self):
+        self.ena_command_path='/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet'
+        self.memory= "-M2000 -R 'select[mem>2000] rusage[mem=2000]'"
+        self.mv_accession1_command = 'mv destination/Accession1/* destination  && rm -rf destination/Accession1'
+        self.mv_accession2_command = 'mv destination/Accession2/* destination  && rm -rf destination/Accession2'
+        self.job_name1 = 'import_Accession1'
+        self.job_name2 = 'import_Accession2'
+        self.reads = ['Accession1', 'Accession2']
+        self.df = pd.DataFrame(([read, 'import_%s' % read] for read in self.reads),
+                                columns=('Read accession', 'Job_name'))
+
+    def test_dataframe_commands_entered_correctly_connection1(self):
+        actual_df=create_commands(self.df,1,'destination')
+        d={'Read accession': self.reads, 'Job_name': [self.job_name1,self.job_name2],
+              'enaDataGet_command':[self.ena_command_path+' -f fastq -d destination Accession1',self.ena_command_path+' -f fastq -d destination Accession2'],
+              'extract_data_command':[self.mv_accession1_command,self.mv_accession2_command],
+              'Command':['bsub -o destination/Accession1.o -e destination/Accession1.e '+self.memory+'  -J import_Accession1 "'+self.ena_command_path+' -f fastq -d destination Accession1 && '+self.mv_accession1_command+'"',
+                         'bsub -o destination/Accession2.o -e destination/Accession2.e '+self.memory+'  -J import_Accession2 -w import_Accession1 "'+self.ena_command_path+' -f fastq -d destination Accession2 && '+self.mv_accession2_command+'"'],
+              'Job_to_depend_on':[None,'import_Accession1']}
+        expected_df = pd.DataFrame(data=d)
+        pd.testing.assert_frame_equal(actual_df,expected_df)
+
+    def test_dataframe_commands_entered_correctly_connections3(self):
+        actual_df = create_commands(self.df,3,'destination')
+
+        d = {'Read accession': self.reads, 'Job_name': [self.job_name1, self.job_name2],
+             'enaDataGet_command': [self.ena_command_path + ' -f fastq -d destination Accession1',
+                                    self.ena_command_path + ' -f fastq -d destination Accession2'],
+             'extract_data_command': [self.mv_accession1_command, self.mv_accession2_command],
+             'Command': [
+                 'bsub -o destination/Accession1.o -e destination/Accession1.e ' + self.memory + '  -J import_Accession1 "' + self.ena_command_path + ' -f fastq -d destination Accession1 && ' + self.mv_accession1_command + '"',
+                 'bsub -o destination/Accession2.o -e destination/Accession2.e ' + self.memory + '  -J import_Accession2 "' + self.ena_command_path + ' -f fastq -d destination Accession2 && ' + self.mv_accession2_command + '"'],
+             }
+        expected_df = pd.DataFrame(data=d)
+        pd.testing.assert_frame_equal(actual_df, expected_df)
+
+class TestSubmitCommands(unittest.TestCase):
+
+    def setUp(self):
+        self.ena_command_path='/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet'
+        self.memory= "-M2000 -R 'select[mem>2000] rusage[mem=2000]'"
+        self.mv_accession1_command = 'mv destination/Accession1/* destination  && rm -rf destination/Accession1'
+        self.mv_accession2_command = 'mv destination/Accession2/* destination  && rm -rf destination/Accession2'
+        self.job_name1 = 'import_Accession1'
+        self.job_name2 = 'import_Accession2'
+        self.reads = ['Accession1', 'Accession2']
+        self.df = pd.DataFrame(([read, 'import_%s' % read] for read in self.reads),
+                                columns=('Read accession', 'Job_name'))
+
+    @patch('importer.writer.runrealcmd')
+    def test_submit_commands_no_job_dependency(self,runrealcmd_patch):
+        d = {'Read accession': self.reads, 'Job_name': [self.job_name1, self.job_name2],
+             'enaDataGet_command': [self.ena_command_path + ' -f fastq -d destination Accession1',
+                                    self.ena_command_path + ' -f fastq -d destination Accession2'],
+             'extract_data_command': [self.mv_accession1_command, self.mv_accession2_command],
+             'Command': [
+                 'bsub -o destination/Accession1.o -e destination/Accession1.e ' + self.memory + '  -J import_Accession1 "' + self.ena_command_path + ' -f fastq -d destination Accession1 && ' + self.mv_accession1_command + '"',
+                 'bsub -o destination/Accession2.o -e destination/Accession2.e ' + self.memory + '  -J import_Accession2 "' + self.ena_command_path + ' -f fastq -d destination Accession2 && ' + self.mv_accession2_command + '"'],
+             }
+        df = pd.DataFrame(data=d)
+        submit_commands(df)
         self.assertEqual(runrealcmd_patch.call_args_list,
-                        [call('bsub -o destination/0/Accession1.o -e destination/0/Accession1.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession1 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination/0 Accession1 && mv destination/0/Accession1/* destination/0  && rm -rf destination/0/Accession1"'),
-                         call('bsub -o destination/0/Accession2.o -e destination/0/Accession2.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession2 -w import_Accession1 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination/0 Accession2 && mv destination/0/Accession2/* destination/0  && rm -rf destination/0/Accession2"')])
+                        [call('bsub -o destination/Accession1.o -e destination/Accession1.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession1 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination Accession1 && mv destination/Accession1/* destination  && rm -rf destination/Accession1"'),
+                         call('bsub -o destination/Accession2.o -e destination/Accession2.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession2 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination Accession2 && mv destination/Accession2/* destination  && rm -rf destination/Accession2"')])
+
+    @patch('importer.writer.runrealcmd')
+    def test_submit_commands_with_job_dependency(self,runrealcmd_patch):
+        d = {'Read accession': self.reads, 'Job_name': [self.job_name1, self.job_name2],
+             'enaDataGet_command': [self.ena_command_path + ' -f fastq -d destination Accession1',
+                                    self.ena_command_path + ' -f fastq -d destination Accession2'],
+             'extract_data_command': [self.mv_accession1_command, self.mv_accession2_command],
+             'Command': [
+                 'bsub -o destination/Accession1.o -e destination/Accession1.e ' + self.memory + '  -J import_Accession1 "' + self.ena_command_path + ' -f fastq -d destination Accession1 && ' + self.mv_accession1_command + '"',
+                 'bsub -o destination/Accession2.o -e destination/Accession2.e ' + self.memory + '  -J import_Accession2 -w import_Accession1 "' + self.ena_command_path + ' -f fastq -d destination Accession2 && ' + self.mv_accession2_command + '"'],
+             }
+        df = pd.DataFrame(data=d)
+        submit_commands(df)
+        self.assertEqual(runrealcmd_patch.call_args_list,
+                         [call('bsub -o destination/Accession1.o -e destination/Accession1.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession1 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination Accession1 && mv destination/Accession1/* destination  && rm -rf destination/Accession1"'),
+                          call('bsub -o destination/Accession2.o -e destination/Accession2.e -M2000 -R \'select[mem>2000] rusage[mem=2000]\'  -J import_Accession2 -w import_Accession1 "/lustre/scratch118/infgen/pathdev/km22/external_import_development/enaBrowserTools/python3/enaDataGet -f fastq -d destination Accession2 && mv destination/Accession2/* destination  && rm -rf destination/Accession2"')])
+
+    @patch('importer.writer.runrealcmd')
+    def test_submit_commands_on_df_with_no_commands(self,runrealcmd_patch):
+        df = pd.DataFrame([] ,columns=('Read accession', 'Job_name'))
+        submit_commands(df)
+        runrealcmd_patch.assert_not_called()
+
 
 class TestXlsGeneration(unittest.TestCase):
     data_dir = os.path.dirname(os.path.abspath(__file__))
