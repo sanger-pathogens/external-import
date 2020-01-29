@@ -23,8 +23,7 @@ A python3 library to parse external import spreadsheets
   * [Usage](#usage)
   * [License](#license)
   * [Feedback/Issues](#feedbackissues)
-  * [Citation](#citation)
-  * [Further Information](#further-information)
+
 
 ##Introduction
 This software can be used to prepare data to be imported into the pathogen's pipelines. There are three steps to this process. 
