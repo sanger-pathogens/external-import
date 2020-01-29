@@ -2,12 +2,12 @@ import re
 import os
 
 
-def print_pf_checks(spreadsheet, outputdir):
+def print_pf_checks(spreadsheet, outputdir, download_reads_from_ENA: bool):
     print("Congratulations, the validation was successful, you now need to perform the below manual checks...:")
     __study_name_should_not_exists(spreadsheet)
     output_directory_for_lanes_and_samples_exists(outputdir)
     __sample_names_should_be_unique_across_the_database(spreadsheet, outputdir)
-    __lane_names_should_be_unique_across_the_database(spreadsheet, outputdir)
+    __lane_names_should_be_unique_across_the_database(spreadsheet, outputdir, download_reads_from_ENA)
 
 
 def __study_name_should_not_exists(spreadsheet):
@@ -43,14 +43,15 @@ pf data -t file --file-id-type sample -i %s
 """ % filename)
 
 
-def __lane_names_should_be_unique_across_the_database(spreadsheet, outputdir):
+def __lane_names_should_be_unique_across_the_database(spreadsheet, outputdir, download_reads_from_ENA: bool):
     names = []
     for read in spreadsheet.reads:
-        if read.reverse_read is None:
+        if download_reads_from_ENA:
+            names.append(read.forward_read)
+        elif read.reverse_read is None:
             names += re.findall("^([^.]+)\\..*$", read.forward_read)
         else:
             names += re.findall("^(.+)_1\\..*$", read.forward_read)
-
     filename = '%s/lanes.txt' % outputdir
     with open(filename, 'w') as file:
         file.writelines(["%s\n" % item for item in names])

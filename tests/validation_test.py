@@ -5,7 +5,7 @@ from importer.pfchecks import output_directory_for_lanes_and_samples_exists, pri
 from importer.model import Spreadsheet, RawRead
 from importer.validation import validate_study_name, validate_mandatory_read_fields, \
     validate_files_are_compressed, validate_pair_naming_convention, validate_uniqueness_of_reads, \
-    validate_no_path_in_filename, validate_external_data_part_of_internal_sequencing_study_name
+    validate_no_path_in_filename, validate_external_data_part_of_internal_sequencing_study_name, check_double_ended_column_is_T_or_F
 
 
 class TestStudyNameContent(unittest.TestCase):
@@ -142,6 +142,20 @@ class TestValidateUniquenessOfReads(unittest.TestCase):
                                                                sample_name='SAMPLE2', taxon_id="1280",
                                                                library_name='LIB2')])))
 
+    def test_uniqueness_of_files_sample_and_library_ENA_download(self):
+        self.assertEqual([],
+                         validate_uniqueness_of_reads(
+                            Spreadsheet.new_instance("1234567890123456",
+                                                     [RawRead(sample_accession=None, forward_read='PAIR1',
+                                                              reverse_read='T',
+                                                              sample_name='SAMPLE1', taxon_id="1280",
+                                                              library_name='LIB1'),
+                                                      RawRead(sample_accession=None, forward_read='PAIR2',
+                                                              reverse_read='F',
+                                                              sample_name='SAMPLE2', taxon_id="1280",
+                                                              library_name='LIB2')])
+        ))
+
 
 class TestValidatePairReadsFileNamingConvention(unittest.TestCase):
     def test_pair_naming_convention_is_valid(self):
@@ -174,6 +188,30 @@ class TestValidatePairReadsFileNamingConvention(unittest.TestCase):
                                                                sample_name='SAMPLE1', taxon_id="1280",
                                                                library_name='LIB1')])))
 
+
+class TestCheckDoubleEndedColumnIsTOrF(unittest.TestCase):
+    def test_T_or_F_is_valid(self):
+        self.assertEqual([],
+                         check_double_ended_column_is_T_or_F(
+                             Spreadsheet.new_instance("1234567890123456",
+                                                      [RawRead(sample_accession=None, forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read='T',
+                                                               sample_name='SAMPLE1', taxon_id="1280",
+                                                               library_name='LIB1'),
+                                                       RawRead(sample_accession=None, forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read='F',
+                                                               sample_name='SAMPLE1', taxon_id="1280",
+                                                               library_name='LIB1')
+                                                       ])))
+
+    def test_none_is_not_valid(self):
+        self.assertEqual(["Double-ended is incorrectly formatted, must be T or F"],
+                         check_double_ended_column_is_T_or_F(
+                             Spreadsheet.new_instance("1234567890123456",
+                                                      [RawRead(sample_accession=None, forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read=None,
+                                                               sample_name='SAMPLE1', taxon_id="1280",
+                                                               library_name='LIB1')])))
 
 class TestReadsAreCompressed(unittest.TestCase):
 

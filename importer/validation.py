@@ -5,15 +5,18 @@ from typing import List
 from importer.model import Spreadsheet, RawRead
 
 
-def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool):
+def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool, download_reads_from_ena: bool):
     results = []
     validators = [validate_study_name,
                   validate_mandatory_read_fields,
-                  validate_files_are_compressed,
-                  validate_pair_naming_convention,
                   validate_uniqueness_of_reads,
-                  validate_no_path_in_filename,
+                  validate_no_path_in_filename
                   ]
+    if not download_reads_from_ena:
+        validators.append(validate_files_are_compressed)
+        validators.append(validate_pair_naming_convention)
+    else:
+        validators.append(check_double_ended_column_is_T_or_F)
     if part_of_internal_study:
         validators.append(validate_external_data_part_of_internal_sequencing_study_name)
     for validator in validators:
@@ -78,6 +81,14 @@ def __validate_pair_naming_convention_for_read(read: RawRead) -> List[str]:
     return result
 
 
+def check_double_ended_column_is_T_or_F(spreadsheet: Spreadsheet) -> List[str]:
+    result = []
+    for read in spreadsheet.reads:
+        if read.reverse_read is not 'T' and read.reverse_read is not 'F':
+            result.append("Double-ended is incorrectly formatted, must be T or F")
+    return result
+
+
 def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     forward_read = defaultdict(int)
     reverse_read = defaultdict(int)
@@ -85,17 +96,17 @@ def validate_uniqueness_of_reads(spreadsheet: Spreadsheet) -> List[str]:
     library_name = defaultdict(int)
     for read in spreadsheet.reads:
         forward_read[read.forward_read] += 1
-        if read.reverse_read is not None:
+        if read.reverse_read is not 'T' and read.reverse_read is not 'F' and read.reverse_read is not None:
             reverse_read[read.reverse_read] += 1
         sample_name[read.sample_name] += 1
         library_name[read.library_name] += 1
 
-    invalid_forwad_read = ["Forward read is not unique: %s" % k for k, v in forward_read.items() if v > 1]
+    invalid_forward_read = ["Forward read is not unique: %s" % k for k, v in forward_read.items() if v > 1]
     invalid_reverse_read = ["Reverse read is not unique: %s" % k for k, v in reverse_read.items() if v > 1]
     invalid_sample_name = ["Sample name is not unique: %s" % k for k, v in sample_name.items() if v > 1]
     invalid_library_name = ["Library name is not unique: %s" % k for k, v in library_name.items() if v > 1]
 
-    return invalid_forwad_read + invalid_reverse_read + invalid_sample_name + invalid_library_name;
+    return invalid_forward_read + invalid_reverse_read + invalid_sample_name + invalid_library_name;
 
 
 def validate_no_path_in_filename(spreadsheet: Spreadsheet) -> List[str]:

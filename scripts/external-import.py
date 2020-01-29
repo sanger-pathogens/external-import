@@ -11,15 +11,14 @@ from importer.validation import validate_spreadsheet
 from importer.writer import Preparation, \
     OutputSpreadsheetGenerator
 
-
 def validate(arguments: argparse.Namespace):
     loader = SpreadsheetLoader(arguments.spreadsheet)
     sheet = loader.load()
-    result = validate_spreadsheet(sheet, arguments.part_of_internal_study)
+    result = validate_spreadsheet(sheet, arguments.part_of_internal_study, arguments.download)
     if result:
         print(result)
     else:
-        print_pf_checks(sheet, arguments.output)
+        print_pf_checks(sheet, arguments.output,arguments.download)
 
 
 def prepare(arguments: argparse.Namespace):
@@ -32,12 +31,16 @@ def prepare(arguments: argparse.Namespace):
     current_position = 0
     while file_ended == False:
         generator = OutputSpreadsheetGenerator(sheet, current_position)
-        workbook, file_ended, current_position = generator.build(arguments.breakpoint)
+        workbook, file_ended, current_position = generator.build(arguments.breakpoint, arguments.download)
         preparation = Preparation.new_instance(sheet, arguments.output, arguments.ticket, instance)
         preparation.create_destination_directory()
         preparation.save_workbook(workbook)
         instance += 1
-    preparation.copy_files(arguments.input)
+    if arguments.download:
+        preparation.download_files_from_ena(connections=arguments.connections)
+
+    else:
+        preparation.copy_files(arguments.input)
 
 
 def load(arguments: argparse.Namespace):
