@@ -58,15 +58,16 @@ pip install .
 
 ### Docker
 The external import can be run in a Docker container. First install Docker 
-and then install external-import.
-```
-docker pull sangerpathogens/external-import
-```
-To use external-import use a command like this, replacind /local/data with where your files are stored.
-```
-docker run --rm -it -v /local/data:/data sangerpathogens/external-import external-import.py --help
-```
+and then install external-import:
+
+    docker pull sangerpathogens/external-import
+
+To use external-import use a command like this, replacing /local/data with where your files are stored:
+
+    docker run --rm -it -v /local/data:/data sangerpathogens/external-import external-import.py --help
+
 When calling external-import (as above) you will need to add /data before any file you pass in.
+
 ## Uninstallation
 ```
 source external_import/bin/activate
