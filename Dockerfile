@@ -16,15 +16,13 @@ RUN apt update -qq -y && \
 RUN pip3 install pandas
 RUN pip3 install testfixtures
 
-RUN ln -s -f /usr/bin/python3 /usr/local/bin/python
-
 # Install external-import
 RUN mkdir -p $EXTERNAL_IMPORT_BUILD_DIR
 COPY . $EXTERNAL_IMPORT_BUILD_DIR
 RUN cd $EXTERNAL_IMPORT_BUILD_DIR \
     && python3 setup.py clean --all \
     && python3 setup.py test \
-    && python3 setup.py install \
+    && python3 setup.py install \ 
     && ln -sf $EXTERNAL_IMPORT_BUILD_DIR/importer /usr/local/bin
 
 #Install enaBrowserTools 
