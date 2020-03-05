@@ -206,7 +206,7 @@ class TestXlsGeneration(unittest.TestCase):
         sheet = self.make_spreadsheet_for_ena_download()
         self.run_function(sheet)
         self.run_workbook_assertions()
-       os.remove('workbook.xls')
+        os.remove('workbook.xls')
 
     def run_workbook_assertions(self):
         WORKBOOK_UNDER_TEST = xlrd.open_workbook('workbook.xls')
