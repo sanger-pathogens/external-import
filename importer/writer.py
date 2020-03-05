@@ -125,6 +125,7 @@ class OutputSpreadsheetGenerator:
                 elif current_row.reverse_read == 'F':
                     forward_read_file = current_row.forward_read + '.fastq.gz'
                     self.sheet.write(position, 0, forward_read_file)
+                    self.sheet.write(position, 1, '')
                 else:
                     print('WARNING: some lines have invalid entries for the double-ended column (not T/F)')
             else:

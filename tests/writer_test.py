@@ -196,11 +196,17 @@ class TestSubmitCommands(unittest.TestCase):
 class TestXlsGeneration(unittest.TestCase):
     data_dir = os.path.dirname(os.path.abspath(__file__))
 
-    def test_of_OutputSpreadsheetGenerator(self):
-        sheet = self.make_spreadsheet()
+    def test_of_OutputSpreadsheetGenerator_for_copy(self):
+        sheet = self.make_spreadsheet_for_copy()
         self.run_function(sheet)
         self.run_workbook_assertions()
         os.remove('workbook.xls')
+
+    def test_of_OutputSpreadsheetGenerator_for_download(self):
+        sheet = self.make_spreadsheet_for_ena_download()
+        self.run_function(sheet)
+        self.run_workbook_assertions()
+       os.remove('workbook.xls')
 
     def run_workbook_assertions(self):
         WORKBOOK_UNDER_TEST = xlrd.open_workbook('workbook.xls')
@@ -230,7 +236,7 @@ class TestXlsGeneration(unittest.TestCase):
         self.assertEqual((current_position, file_ended), (2, True))
         return current_position, file_ended
 
-    def make_spreadsheet(self):
+    def make_spreadsheet_for_copy(self):
         sheet = Spreadsheet()
         sheet.supplier, sheet.organisation, sheet.contact, sheet.technology, sheet.name, sheet.accession, sheet.size, \
         sheet.limit = ('Supplier', 'Org', 'Contact', 'Illumina', 'AStudyName1', None, 1.90, '01/01/2025')
@@ -240,11 +246,20 @@ class TestXlsGeneration(unittest.TestCase):
                                taxon_id='1280', library_name='LIB2', sample_accession=None)]
         return sheet
 
+    def make_spreadsheet_for_ena_download(self):
+        sheet = Spreadsheet()
+        sheet.supplier, sheet.organisation, sheet.contact, sheet.technology, sheet.name, sheet.accession, sheet.size, \
+        sheet.limit = ('Supplier', 'Org', 'Contact', 'Illumina', 'AStudyName1', None, 1.90, '01/01/2025')
+        sheet.reads = [RawRead(forward_read='PAIR1', reverse_read='T', sample_name='SAMPLE1',
+                               taxon_id='1280', library_name='LIB1', sample_accession=None),
+                       RawRead(forward_read='Pair2.fastq.gz', reverse_read='F', sample_name='SAMPLE2',
+                               taxon_id='1280', library_name='LIB2', sample_accession=None)]
+        return sheet
+
     def test_of_preparation_initialization(self):
         spreadsheet = Spreadsheet()
         preparation = Preparation.new_instance(spreadsheet, AN_OUTPUT, A_TICKET, AN_INSTANCE)
         self.assert_preparation(preparation, spreadsheet)
-
 
     def assert_preparation(self, preparation, spreadsheet):
         self.assertEqual(preparation.destination, AN_OUTPUT + '/' + str(A_TICKET))
