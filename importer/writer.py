@@ -42,7 +42,6 @@ class Preparation:
         single_ended_file = self.destination + '/' + accession + '.fastq.gz'
         forward_file= self.destination + '/' +  accession + '_1.fastq.gz'
         reverse_file= self.destination + '/' + accession + '_2.fastq.gz'
-        print(self.destination)
         if path.exists(single_ended_file):
             return True
         elif path.exists(forward_file) and path.exists(reverse_file):

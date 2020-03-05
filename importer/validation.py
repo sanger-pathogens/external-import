@@ -32,7 +32,6 @@ def validate_study_name(spreadsheet: Spreadsheet) -> List[str]:
 
 def validate_no_abnormal_characters_in_supplier_name(spreadsheet: Spreadsheet) -> List[str]:
     invalid_chars = re.findall("[^\\w _\\d]", spreadsheet.supplier)
-    print(invalid_chars)
     return ["Invalid chars %s found in study name" % x for x in invalid_chars]
 
 
