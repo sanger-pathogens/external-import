@@ -5,7 +5,8 @@ from importer.pfchecks import output_directory_for_lanes_and_samples_exists, pri
 from importer.model import Spreadsheet, RawRead
 from importer.validation import validate_study_name, validate_mandatory_read_fields, \
     validate_files_are_compressed, validate_pair_naming_convention, validate_uniqueness_of_reads, \
-    validate_no_path_in_filename, validate_external_data_part_of_internal_sequencing_study_name, check_double_ended_column_is_T_or_F
+    validate_no_path_in_filename, validate_external_data_part_of_internal_sequencing_study_name, check_double_ended_column_is_T_or_F, \
+    validate_no_abnormal_characters_in_supplier_name, validate_no_hyphen_in_filename
 
 
 class TestStudyNameContent(unittest.TestCase):
@@ -17,6 +18,13 @@ class TestStudyNameContent(unittest.TestCase):
         self.assertEqual(34,
                          len(validate_study_name(Spreadsheet.new_instance("!\"£$%^&*()+={}[]:@~;'#?/>.<,|\\`¬ \t"))))
 
+class TestSupplierNameContent(unittest.TestCase):
+
+    def test_supplier_name_with_valid_char_should_pass_validation(self):
+        self.assertEqual([], validate_no_abnormal_characters_in_supplier_name(Spreadsheet.new_instance("name",supplier="This should work")))
+
+    def test_supplier_name_with_invalid_char_should_fail_validation(self):
+        self.assertEqual(33, len(validate_no_abnormal_characters_in_supplier_name(Spreadsheet.new_instance("name",supplier="!\"£$%^&*()+={}[]:@~;'#?/>.<,|\\`¬\t"))))
 
 class TestStudyNameWhenPartOfInternalSequencing(unittest.TestCase):
 
@@ -59,6 +67,38 @@ class TestValidateNoPathInFilename(unittest.TestCase):
                                                       [RawRead(sample_accession=None,
                                                                forward_read='/some/path/PAIR1_1.fastq.gz',
                                                                reverse_read='/some/path/PAIR1_2.fastq.gz',
+                                                               sample_name='SAMPLE1', taxon_id="1280",
+                                                               library_name='LIB1')])))
+
+
+class TestValidateNoHyphenInFilename(unittest.TestCase):
+
+    def test_no_hyphen_in_filename(self):
+        self.assertEqual([],
+                         validate_no_hyphen_in_filename(
+                             Spreadsheet.new_instance("1234567890123456",
+                                                      [RawRead(sample_accession=None, forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read='PAIR1_2.fastq.gz',
+                                                               sample_name='SAMPLE1', taxon_id="1280",
+                                                               library_name='LIB1')])))
+
+    def test_no_hyphen_in_filename_single_read(self):
+        self.assertEqual([],
+                         validate_no_hyphen_in_filename(
+                             Spreadsheet.new_instance("1234567890123456",
+                                                      [RawRead(sample_accession=None, forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read=None,
+                                                               sample_name='SAMPLE1', taxon_id="1280",
+                                                               library_name='LIB1')])))
+
+    def test_hyphen_in_filename_is_invalid(self):
+        self.assertEqual(['Hyphen present in filename: PAIR-1_1.fastq.gz',
+                          'Hyphen present in filename: PAIR-1_2.fastq.gz'],
+                         validate_no_hyphen_in_filename(
+                             Spreadsheet.new_instance("1234567890123456",
+                                                      [RawRead(sample_accession=None,
+                                                               forward_read='PAIR-1_1.fastq.gz',
+                                                               reverse_read='PAIR-1_2.fastq.gz',
                                                                sample_name='SAMPLE1', taxon_id="1280",
                                                                library_name='LIB1')])))
 

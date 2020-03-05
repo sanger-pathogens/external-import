@@ -10,7 +10,9 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
     validators = [validate_study_name,
                   validate_mandatory_read_fields,
                   validate_uniqueness_of_reads,
-                  validate_no_path_in_filename
+                  validate_no_path_in_filename,
+                  validate_no_hyphen_in_filename,
+                  validate_no_abnormal_characters_in_supplier_name
                   ]
     if not download_reads_from_ena:
         validators.append(validate_files_are_compressed)
@@ -23,9 +25,14 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
         results += validator(spreadsheet)
     return results
 
-
 def validate_study_name(spreadsheet: Spreadsheet) -> List[str]:
     invalid_chars = re.findall("[^\\w_\\d]", spreadsheet.name)
+    return ["Invalid chars %s found in study name" % x for x in invalid_chars]
+
+
+def validate_no_abnormal_characters_in_supplier_name(spreadsheet: Spreadsheet) -> List[str]:
+    invalid_chars = re.findall("[^\\w _\\d]", spreadsheet.supplier)
+    print(invalid_chars)
     return ["Invalid chars %s found in study name" % x for x in invalid_chars]
 
 
@@ -120,4 +127,18 @@ def __validate_no_path_in_filename_for_read(read: RawRead) -> List[str]:
         result.append("Path present in filename: %s" % str(read.forward_read))
     if read.reverse_read is not None and "/" in read.reverse_read:
         result.append("Path present in filename: %s" % str(read.reverse_read))
+    return result
+
+
+def validate_no_hyphen_in_filename(spreadsheet: Spreadsheet) -> List[str]:
+    read_errors = [__validate_no_hyphen_in_filename_for_read(read) for read in spreadsheet.reads]
+    return [item for sublist in read_errors for item in sublist]
+
+
+def __validate_no_hyphen_in_filename_for_read(read: RawRead) -> List[str]:
+    result = []
+    if "-" in read.forward_read:
+        result.append("Hyphen present in filename: %s" % str(read.forward_read))
+    if read.reverse_read is not None and "-" in read.reverse_read:
+        result.append("Hyphen present in filename: %s" % str(read.reverse_read))
     return result

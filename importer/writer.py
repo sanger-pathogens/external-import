@@ -118,11 +118,16 @@ class OutputSpreadsheetGenerator:
                 break
             current_row = self.spreadsheet.reads[self.row]
             if download:
-                forward_read_file = current_row.forward_read + '_1.fastq.gz'
-                self.sheet.write(position, 0, forward_read_file)
                 if current_row.reverse_read == 'T':
+                    forward_read_file = current_row.forward_read + '_1.fastq.gz'
+                    self.sheet.write(position, 0, forward_read_file)
                     reverse_read_file = current_row.forward_read + '_2.fastq.gz'
                     self.sheet.write(position, 1, reverse_read_file)
+                elif current_row.reverse_read == 'F':
+                    forward_read_file = current_row.forward_read + '.fastq.gz'
+                    self.sheet.write(position, 0, forward_read_file)
+                else:
+                    print('WARNING: some lines have invalid entries for the double-ended column (not T/F)')
             else:
                 self.sheet.write(position, 0, current_row.forward_read)
                 if current_row.reverse_read is not None:
