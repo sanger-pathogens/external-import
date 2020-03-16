@@ -66,7 +66,7 @@ def create_commands(df, connections, destination):
         memory = "-M2000 -R 'select[mem>2000] rusage[mem=2000]' "
         if i >= connections:
             df.loc[i, 'Job_to_depend_on'] = df.loc[i - connections, 'Job_name']
-            df.loc[i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e %s -J import_%s -w %s "%s && %s"' % (
+            df.loc[i, 'Command'] = 'bsub -o %s/%s.o -e %s/%s.e %s -J import_%s -w \'ended("%s")\' "%s && %s"' % (
                 destination, df.loc[i, 'Read accession'], destination, df.loc[i, 'Read accession'], memory, df.loc[i, 'Read accession'],df.loc[i, 'Job_to_depend_on'],df.loc[i,'enaDataGet_command'], df.loc[i,'extract_data_command'])
         if i< connections:
             df.loc[

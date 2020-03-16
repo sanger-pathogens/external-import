@@ -122,7 +122,7 @@ class TestCreateCommands(unittest.TestCase):
               'enaDataGet_command':[self.ena_command_path+' -f fastq -d destination Accession1',self.ena_command_path+' -f fastq -d destination Accession2'],
               'extract_data_command':[self.mv_accession1_command,self.mv_accession2_command],
               'Command':['bsub -o destination/Accession1.o -e destination/Accession1.e '+self.memory+'  -J import_Accession1 "'+self.ena_command_path+' -f fastq -d destination Accession1 && '+self.mv_accession1_command+'"',
-                         'bsub -o destination/Accession2.o -e destination/Accession2.e '+self.memory+'  -J import_Accession2 -w import_Accession1 "'+self.ena_command_path+' -f fastq -d destination Accession2 && '+self.mv_accession2_command+'"'],
+                         'bsub -o destination/Accession2.o -e destination/Accession2.e '+self.memory+'  -J import_Accession2 -w \'ended("import_Accession1")\' "'+self.ena_command_path+' -f fastq -d destination Accession2 && '+self.mv_accession2_command+'"'],
               'Job_to_depend_on':[None,'import_Accession1']}
         expected_df = pd.DataFrame(data=d)
         pd.testing.assert_frame_equal(actual_df,expected_df)
