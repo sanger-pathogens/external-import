@@ -4,15 +4,9 @@ A python3 library to parse external import spreadsheets
 [![Build Status](https://travis-ci.org/sanger-pathogens/external-import.svg?branch=master)](https://travis-ci.org/sanger-pathogens/external-import)   
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-brightgreen.svg)](https://github.com/sanger-pathogens/external-import/blob/master/LICENSE)   
 [![codecov](https://codecov.io/gh/sanger-pathogens/external-import/branch/master/graph/badge.svg)](https://codecov.io/gh/sanger-pathogens/external-import) 
-<!--
-[![status](https://img.shields.io/badge/MGEN-10.1099%2Fmgen.0.000056-brightgreen.svg)](http://mgen.microbiologyresearch.org/content/journal/mgen/10.1099/mgen.0.000186)   
-[![status](https://img.shields.io/badge/Bioinformatics-10.1093-brightgreen.svg)](https://doi.org/10.1093/bioinformatics/btw022)  
-[![status](https://img.shields.io/badge/GenomeBiology-10.1186-brightgreen.svg)](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0849-0)   
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/seroba/README.html)  
-[![Container ready](https://img.shields.io/badge/container-ready-brightgreen.svg)](https://quay.io/repository/biocontainers/seroba)  
-[![Docker Build Status](https://img.shields.io/docker/build/sangerpathogens/seroba.svg)](https://hub.docker.com/r/sangerpathogens/seroba)  
-[![Docker Pulls](https://img.shields.io/docker/pulls/sangerpathogens/seroba.svg)](https://hub.docker.com/r/sangerpathogens/seroba)  
--->
+[![Docker Build Status](https://img.shields.io/docker/cloud/build/sangerpathogens/external-import.svg)](https://hub.docker.com/r/sangerpathogens/external-import)  
+[![Docker Pulls](https://img.shields.io/docker/pulls/sangerpathogens/external-import.svg)](https://hub.docker.com/r/sangerpathogens/external-import)  
+
 # WIP
 ## Contents
   * [Introduction](#introduction)
