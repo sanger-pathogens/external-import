@@ -9,7 +9,8 @@ DATABASE = 'database'
 COMMAND_FILE_NAME = '/tmp'
 COMMAND_1 = DataImporter('base/123', 123, 0, 'database')
 COMMAND_2 = DataImporter('base/123', 123, 1, 'database')
-COMMANDS = [COMMAND_1, COMMAND_2]
+COMMAND_3 = DataImporter('base/123', 123, 2, 'database')
+COMMANDS = [COMMAND_1, COMMAND_2, COMMAND_3]
 
 def glob_replacer(ticket_string, recursive):
     if ticket_string != f'/lustre/scratch118/infgen/pathogen/pathpipe/external_seq_data/{TICKET}/external_{TICKET}_*.xls':
@@ -17,7 +18,7 @@ def glob_replacer(ticket_string, recursive):
     elif recursive != False:
         raise Exception('Recursive not set to false.')
     else:
-        GLOB_LIST = ['one', 'two']
+        GLOB_LIST = ['one', 'two', 'three']
         return GLOB_LIST
 
 class importerTesting(unittest.TestCase):
@@ -38,30 +39,55 @@ class importerTesting(unittest.TestCase):
             '\n',
             '    # Execute the below to import:\n',
             '\n',
-            'cd /software/pathogen/projects/update_pipeline\n',
-            '\n',
             f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}_0.log -e {OUTPUT}/{TICKET}/external_{TICKET}_0.err -M2000 \\\n',
             f'  -J external_{TICKET}_0 -q long \\\n',
-            '''  -R "select[mem>2000] rusage[mem=2000]" './bin/update_pipeline_from_spreadsheet.pl \\\n''',
+            '''  -R "select[mem>2000] rusage[mem=2000]" 'update_pipeline_from_spreadsheet.pl \\\n''',
             f'  -d {DATABASE} \\\n',
             f'  -f {OUTPUT}/{TICKET} \\\n',
             f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
             f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xls'\n",
             '\n',
             '\n',
-            f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}_1.log -e {OUTPUT}/{TICKET}/external_{TICKET}_1.err -M2000 \\\n',
-            f'  -J external_{TICKET}_1 -q long \\\n',
-            '''  -R "select[mem>2000] rusage[mem=2000]" './bin/update_pipeline_from_spreadsheet.pl \\\n''',
+            f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}.%J.%I.o -e {OUTPUT}/{TICKET}/external_{TICKET}.%J.%I.e -M2000 \\\n',
+            f'  -w ended(external_{TICKET}_0) \\\n',
+            f'  -J external_{TICKET}[1-2]%5 -q long \\\n',
+            '''  -R "select[mem>2000] rusage[mem=2000]" 'update_pipeline_from_spreadsheet.pl \\\n''',
             f'  -d {DATABASE} \\\n',
             f'  -f {OUTPUT}/{TICKET} \\\n',
             f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
-            f"  {OUTPUT}/{TICKET}/external_{TICKET}_1.xls'\n",
+            f"  {OUTPUT}/{TICKET}/external_{TICKET}_\$LSB_JOBINDEX.xls'\n",
             '\n',
             '\n',
             '# Then following the external data import SOP to register the study\n',
             '\n']
 
         DataImporter.load(COMMANDS, COMMAND_FILE_NAME)
+
+        if os.path.isfile(f'/tmp/command_file.sh'):
+            TESTED_FILE = open(f'{COMMAND_FILE_NAME}/command_file.sh')
+            for index, LINE in enumerate(TESTED_FILE):
+                self.assertEqual(LINE, TESTER_LINES[index])
+        else:
+            self.fail('The command_file.sh was not properly created in /tmp.')
+
+    def test_importer_printout_single_job(self):
+        TESTER_LINES = ['#!/bin/bash\n',
+            '\n',
+            '    # Execute the below to import:\n',
+            '\n',
+            f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}_0.log -e {OUTPUT}/{TICKET}/external_{TICKET}_0.err -M2000 \\\n',
+            f'  -J external_{TICKET}_0 -q long \\\n',
+            '''  -R "select[mem>2000] rusage[mem=2000]" 'update_pipeline_from_spreadsheet.pl \\\n''',
+            f'  -d {DATABASE} \\\n',
+            f'  -f {OUTPUT}/{TICKET} \\\n',
+            f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
+            f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xls'\n",
+            '\n',
+            '\n',
+            '# Then following the external data import SOP to register the study\n',
+            '\n']
+
+        DataImporter.load([COMMAND_1], COMMAND_FILE_NAME)
 
         if os.path.isfile(f'/tmp/command_file.sh'):
             TESTED_FILE = open(f'{COMMAND_FILE_NAME}/command_file.sh')

@@ -26,19 +26,30 @@ class DataImporter:
         command_file.write("""#!/bin/bash
 
     # Execute the below to import:
-
-cd /software/pathogen/projects/update_pipeline
 """)
-
-        for command in commands:
-            command_file.write(f"""
+        command = commands[0]
+        command_file.write(f"""
 bsub -o {command.destination}/external_{command.ticket}_{command.index}.log -e {command.destination}/external_{command.ticket}_{command.index}.err -M2000 \\
   -J external_{command.ticket}_{command.index} -q long \\
-  -R "select[mem>2000] rusage[mem=2000]" './bin/update_pipeline_from_spreadsheet.pl \\
+  -R "select[mem>2000] rusage[mem=2000]" 'update_pipeline_from_spreadsheet.pl \\
   -d {command.database} \\
   -f {command.destination} \\
   -p /lustre/scratch118/infgen/pathogen/pathpipe/{command.database}/seq-pipelines \\
   {command.destination}/external_{command.ticket}_{command.index}.xls'
+
+""")
+        dependency = f"external_{command.ticket}_{command.index}"
+        length = len(commands) - 1
+        if length > 1 :
+            command_file.write(f"""
+bsub -o {command.destination}/external_{command.ticket}.%J.%I.o -e {command.destination}/external_{command.ticket}.%J.%I.e -M2000 \\
+  -w ended({dependency}) \\
+  -J external_{command.ticket}[1-{length}]%5 -q long \\
+  -R "select[mem>2000] rusage[mem=2000]" 'update_pipeline_from_spreadsheet.pl \\
+  -d {command.database} \\
+  -f {command.destination} \\
+  -p /lustre/scratch118/infgen/pathogen/pathpipe/{command.database}/seq-pipelines \\
+  {command.destination}/external_{command.ticket}_\$LSB_JOBINDEX.xls'
 
 """)
         command_file.write("""
