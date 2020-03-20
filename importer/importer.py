@@ -40,7 +40,7 @@ bsub -o {command.destination}/external_{command.ticket}_{command.index}.log -e {
 """)
         dependency = f"external_{command.ticket}_{command.index}"
         length = len(commands) - 1
-        if length > 1 :
+        if length >= 1:
             command_file.write(f"""
 bsub -o {command.destination}/external_{command.ticket}.%J.%I.o -e {command.destination}/external_{command.ticket}.%J.%I.e -M2000 \\
   -w ended({dependency}) \\
