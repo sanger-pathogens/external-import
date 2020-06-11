@@ -15,8 +15,8 @@ class TestStudyNameContent(unittest.TestCase):
         self.assertEqual([], validate_study_name(Spreadsheet.new_instance("ValidName12345__")))
 
     def test_study_name_with_invalid_char_should_fail_validation(self):
-        self.assertEqual(34,
-                         len(validate_study_name(Spreadsheet.new_instance("!\"£$%^&*()+={}[]:@~;'#?/>.<,|\\`¬ \t"))))
+        self.assertEqual(33,
+                         len(validate_study_name(Spreadsheet.new_instance("!\"£$%^&*()+={}[]:@~;'#?/>.<,|\\`¬\t"))))
 
 class TestSupplierNameContent(unittest.TestCase):
 
