@@ -26,13 +26,13 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
     return results
 
 def validate_study_name(spreadsheet: Spreadsheet) -> List[str]:
-    invalid_chars = re.findall("[^\\w_\\d]", spreadsheet.name)
+    invalid_chars = re.findall("[^\\w _\\d]", spreadsheet.name)
     return ["Invalid chars %s found in study name" % x for x in invalid_chars]
 
 
 def validate_no_abnormal_characters_in_supplier_name(spreadsheet: Spreadsheet) -> List[str]:
     invalid_chars = re.findall("[^\\w _\\d]", spreadsheet.supplier)
-    return ["Invalid chars %s found in study name" % x for x in invalid_chars]
+    return ["Invalid chars %s found in supplier name" % x for x in invalid_chars]
 
 
 def validate_external_data_part_of_internal_sequencing_study_name(spreadsheet: Spreadsheet) -> List[str]:
