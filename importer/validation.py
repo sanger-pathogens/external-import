@@ -12,7 +12,8 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
                   validate_uniqueness_of_reads,
                   validate_no_path_in_filename,
                   validate_no_hyphen_in_filename,
-                  validate_no_abnormal_characters_in_supplier_name
+                  validate_no_abnormal_characters_in_supplier_name,
+                  validate_no_hyphen_in_descriptive_names
                   ]
     if not download_reads_from_ena:
         validators.append(validate_files_are_compressed)
@@ -140,4 +141,18 @@ def __validate_no_hyphen_in_filename_for_read(read: RawRead) -> List[str]:
         result.append("Hyphen present in filename: %s" % str(read.forward_read))
     if read.reverse_read is not None and "-" in read.reverse_read:
         result.append("Hyphen present in filename: %s" % str(read.reverse_read))
+    return result
+
+
+def validate_no_hyphen_in_descriptive_names(spreadsheet: Spreadsheet) -> List[str]:
+    read_errors = [__validate_no_hyphen_in_library_or_sample_name_for_read(read) for read in spreadsheet.reads]
+    return [item for sublist in read_errors for item in sublist]
+
+
+def __validate_no_hyphen_in_library_or_sample_name_for_read(read: RawRead) -> List[str]:
+    result = []
+    if "-" in read.sample_name:
+        result.append("Hyphen present in sample name: %s" % str(read.sample_name))
+    if "-" in read.library_name:
+        result.append("Hyphen present in library name: %s" % str(read.library_name))
     return result

@@ -6,7 +6,7 @@ from importer.model import Spreadsheet, RawRead
 from importer.validation import validate_study_name, validate_mandatory_read_fields, \
     validate_files_are_compressed, validate_pair_naming_convention, validate_uniqueness_of_reads, \
     validate_no_path_in_filename, validate_external_data_part_of_internal_sequencing_study_name, check_double_ended_column_is_T_or_F, \
-    validate_no_abnormal_characters_in_supplier_name, validate_no_hyphen_in_filename
+    validate_no_abnormal_characters_in_supplier_name, validate_no_hyphen_in_filename, validate_no_hyphen_in_descriptive_names
 
 
 class TestStudyNameContent(unittest.TestCase):
@@ -70,6 +70,25 @@ class TestValidateNoPathInFilename(unittest.TestCase):
                                                                sample_name='SAMPLE1', taxon_id="1280",
                                                                library_name='LIB1')])))
 
+    def test_hyphen_in_sample_name_is_invalid(self):
+        self.assertEqual(["Hyphen present in sample name: SAMPLE1-1", ],
+                         validate_no_hyphen_in_descriptive_names(
+                             Spreadsheet.new_instance("1234567890123456",
+                                                      [RawRead(sample_accession=None,
+                                                               forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read='PAIR1_2.fastq.gz',
+                                                               sample_name='SAMPLE1-1', taxon_id="1280",
+                                                               library_name='LIB1')])))
+
+    def test_hyphen_in_library_name_is_invalid(self):
+        self.assertEqual(["Hyphen present in library name: LIB-1", ],
+                         validate_no_hyphen_in_descriptive_names(
+                             Spreadsheet.new_instance("1234567890123456",
+                                                      [RawRead(sample_accession=None,
+                                                               forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read='PAIR1_2.fastq.gz',
+                                                               sample_name='SAMPLE1', taxon_id="1280",
+                                                               library_name='LIB-1')])))
 
 class TestValidateNoHyphenInFilename(unittest.TestCase):
 
