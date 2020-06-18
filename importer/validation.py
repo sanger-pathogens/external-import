@@ -68,10 +68,14 @@ def validate_files_are_compressed(spreadsheet: Spreadsheet) -> List[str]:
 
 def __validate_files_are_compressed_for_read(read: RawRead) -> List[str]:
     result = []
-    if not read.forward_read.endswith("_1.fastq.gz"):
-        result.append("Forward read file is not correctly formatted for %s" % str(read))
-    if read.reverse_read is not None and not read.reverse_read.endswith("_2.fastq.gz"):
-        result.append("Reverse read file is not correctly formatted for %s" % str(read))
+    if read.reverse_read is None:
+        if not read.forward_read.endswith(".fastq.gz"):
+            result.append("Forward read file is not correctly formatted for %s" % str(read))
+    else:
+        if not read.forward_read.endswith("_1.fastq.gz"):
+            result.append("Forward read file is not correctly formatted for %s" % str(read))
+        if not read.reverse_read.endswith("_2.fastq.gz"):
+            result.append("Reverse read file is not correctly formatted for %s" % str(read))
     return result
 
 

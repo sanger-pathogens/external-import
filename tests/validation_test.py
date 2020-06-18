@@ -310,7 +310,7 @@ class TestReadsAreCompressed(unittest.TestCase):
         self.assertEqual([],
                          validate_files_are_compressed(
                              Spreadsheet.new_instance("1234567890123456",
-                                                      [RawRead(sample_accession=None, forward_read='PAIR1_1.fastq.gz',
+                                                      [RawRead(sample_accession=None, forward_read='PAIR1.fastq.gz',
                                                                reverse_read=None,
                                                                sample_name='SAMPLE1', taxon_id="1280",
                                                                library_name='LIB1')])))
