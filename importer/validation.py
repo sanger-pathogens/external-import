@@ -51,8 +51,7 @@ def validate_mandatory_read_fields(spreadsheet):
 def __validate_mandatory_read_fields_for_read(read: RawRead) -> List[str]:
     result = []
     if read.forward_read is None:
-        __validate_row_fill_status(read)
-        raise Exception('Missing or corrupt read in spreadsheet')
+        raise Exception('Missing forward read or blank row found in spreadsheet; fix reads and concatenate rows')
     if read.sample_name is None:
         result.append("Missing sample name for %s" % str(read))
     if read.taxon_id is None:
@@ -60,11 +59,6 @@ def __validate_mandatory_read_fields_for_read(read: RawRead) -> List[str]:
     if read.library_name is None:
         result.append("Missing library name for %s" % str(read))
     return result
-
-def __validate_row_fill_status(read):
-    if read.forward_read is None and read.reverse_read is None and read.sample_name is None and read.taxon_id is None \
-            and read.library_name is None and read.sample_accession:
-        raise Exception('Empty row has been found; concatenate rows and clear hanging area')
 
 def validate_files_are_compressed(spreadsheet: Spreadsheet) -> List[str]:
     read_errors = [__validate_files_are_compressed_for_read(read) for read in spreadsheet.reads]
