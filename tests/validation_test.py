@@ -336,14 +336,13 @@ class TestMandatoryFieldsForReads(unittest.TestCase):
                                                                library_name='LIB1')])))
 
     def test_forward_read_not_populated(self):
-        self.assertEqual(["Missing forward_read for RawRead(forward_read=None, reverse_read=None, "
-                          "sample_name='SAMPLE1', sample_accession=None, taxon_id='1280', library_name='LIB1')"],
-                         validate_mandatory_read_fields(
-                             Spreadsheet.new_instance("1234567890123456",
-                                                      [RawRead(sample_accession=None, forward_read=None,
-                                                               reverse_read=None,
-                                                               sample_name='SAMPLE1', taxon_id="1280",
-                                                               library_name='LIB1')])))
+        with self.assertRaises(Exception):
+                          validate_mandatory_read_fields(
+                              Spreadsheet.new_instance("1234567890123456",
+                                                       [RawRead(sample_accession=None, forward_read=None,
+                                                                reverse_read=None,
+                                                                sample_name='SAMPLE1', taxon_id="1280",
+                                                                library_name='LIB1')]))
 
     def test_sample_name_not_populated(self):
         self.assertEqual(["Missing sample name for RawRead(forward_read='READ.fastq.gz', reverse_read=None, "
