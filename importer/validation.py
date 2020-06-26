@@ -51,6 +51,7 @@ def validate_mandatory_read_fields(spreadsheet):
 def __validate_mandatory_read_fields_for_read(read: RawRead) -> List[str]:
     result = []
     if read.forward_read is None:
+        __validate_row_fill_status(read)
         result.append("Missing forward_read for %s" % str(read))
     if read.sample_name is None:
         result.append("Missing sample name for %s" % str(read))
@@ -60,6 +61,10 @@ def __validate_mandatory_read_fields_for_read(read: RawRead) -> List[str]:
         result.append("Missing library name for %s" % str(read))
     return result
 
+def __validate_row_fill_status(read):
+    if read.forward_read is None and read.reverse_read is None and read.sample_name is None and read.taxon_id is None \
+            and read.library_name is None and read.sample_accession:
+        raise Exception('Empty row has been found; concatenate rows and clear hanging area')
 
 def validate_files_are_compressed(spreadsheet: Spreadsheet) -> List[str]:
     read_errors = [__validate_files_are_compressed_for_read(read) for read in spreadsheet.reads]
@@ -68,7 +73,7 @@ def validate_files_are_compressed(spreadsheet: Spreadsheet) -> List[str]:
 
 def __validate_files_are_compressed_for_read(read: RawRead) -> List[str]:
     result = []
-    if not read.forward_read.endswith("_1.fastq.gz"):
+    if read.forward_read is not None and not read.forward_read.endswith("_1.fastq.gz"):
         result.append("Forward read file is not correctly formatted for %s" % str(read))
     if read.reverse_read is not None and not read.reverse_read.endswith("_2.fastq.gz"):
         result.append("Reverse read file is not correctly formatted for %s" % str(read))
@@ -122,7 +127,7 @@ def validate_no_path_in_filename(spreadsheet: Spreadsheet) -> List[str]:
 
 def __validate_no_path_in_filename_for_read(read: RawRead) -> List[str]:
     result = []
-    if "/" in read.forward_read:
+    if read.forward_read is not None and "/" in read.forward_read:
         result.append("Path present in filename: %s" % str(read.forward_read))
     if read.reverse_read is not None and "/" in read.reverse_read:
         result.append("Path present in filename: %s" % str(read.reverse_read))
@@ -136,7 +141,7 @@ def validate_no_hyphen_in_filename(spreadsheet: Spreadsheet) -> List[str]:
 
 def __validate_no_hyphen_in_filename_for_read(read: RawRead) -> List[str]:
     result = []
-    if "-" in read.forward_read:
+    if read.forward_read is not None and "-" in read.forward_read:
         result.append("Hyphen present in filename: %s" % str(read.forward_read))
     if read.reverse_read is not None and "-" in read.reverse_read:
         result.append("Hyphen present in filename: %s" % str(read.reverse_read))

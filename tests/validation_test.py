@@ -335,6 +335,15 @@ class TestMandatoryFieldsForReads(unittest.TestCase):
                                                                sample_name='SAMPLE1', taxon_id="1280",
                                                                library_name='LIB1')])))
 
+    def test_exception_on_blank_line(self):
+        self.assertRaises(Exception,
+                         validate_mandatory_read_fields(
+                             Spreadsheet.new_instance("1234567890123456",
+                                                      [RawRead(sample_accession=None, forward_read=None,
+                                                               reverse_read=None,
+                                                               sample_name=None, taxon_id=None,
+                                                               library_name=None)])))
+
     def test_forward_read_not_populated(self):
         self.assertEqual(["Missing forward_read for RawRead(forward_read=None, reverse_read=None, "
                           "sample_name='SAMPLE1', sample_accession=None, taxon_id='1280', library_name='LIB1')"],
