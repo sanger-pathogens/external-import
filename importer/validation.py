@@ -52,7 +52,7 @@ def __validate_mandatory_read_fields_for_read(read: RawRead) -> List[str]:
     result = []
     if read.forward_read is None:
         __validate_row_fill_status(read)
-        result.append("Missing forward_read for %s" % str(read))
+        raise Exception('Missing or corrupt read in spreadsheet')
     if read.sample_name is None:
         result.append("Missing sample name for %s" % str(read))
     if read.taxon_id is None:
