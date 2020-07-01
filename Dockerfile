@@ -3,7 +3,7 @@ WORKDIR /opt
 
 ARG TAG
 ARG EXTERNAL_IMPORT_BUILD_DIR=/external-import
-ARG ENA_BROWSER_TOOLS_VERSION=1.5.4
+ARG ENA_BROWSER_TOOLS_VERSION=1.5.5
 
 RUN apt update -qq -y && \
     apt upgrade -qq -y && \
