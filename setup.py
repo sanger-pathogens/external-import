@@ -1,7 +1,7 @@
 import glob
 import os
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def read(fname):
@@ -18,7 +18,7 @@ setup(
     version=version,
     description='Parse spreadsheets of external import',
     long_description=read('README.md'),
-    packages=['importer'],
+    packages=find_packages(),
     author='Olivier Seret',
     author_email='path-help@sanger.ac.uk',
     url='https://github.com/sanger-pathogens/external-import',
