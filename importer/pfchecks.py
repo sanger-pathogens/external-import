@@ -11,7 +11,7 @@ def print_pf_checks(spreadsheet, outputdir, download_reads_from_ENA: bool):
 
 
 def __study_name_should_not_exists(spreadsheet):
-    cmd = f"pf data -t study -i {spreadsheet.name}"
+    cmd = f"pf data -t study -i '{spreadsheet.name}'"
     print(f"""
 Check for presence of the study; run the following command:
 {cmd}
@@ -39,7 +39,7 @@ def __sample_names_should_be_unique_across_the_database(spreadsheet, outputdir):
         file.writelines(["%s\n" % item for item in samples])
     print("""Check that the sample and library names are unique in the database.
 The following commands should return no data:
-pf data -t file --file-id-type sample -i %s
+pf data -t file --file-id-type sample -i '%s'
 """ % filename)
 
 
@@ -61,5 +61,5 @@ def __lane_names_should_be_unique_across_the_database(spreadsheet, outputdir, do
         message += "pf data -N -t lane -i %s\n" % name
     print("""Check that the lanes are unique in the database.
 The following commands should return no data:
-pf data -t file --file-id-type lane -i %s
+pf data -t file --file-id-type lane -i '%s'
 """ % filename)
