@@ -149,14 +149,12 @@ def __validate_no_hyphen_in_filename_for_read(read: RawRead) -> List[str]:
 
 
 def validate_sample_names(spreadsheet: Spreadsheet) -> List[str]:
-    read_errors = [__validate_sample_name_for_read(read) for read in spreadsheet.reads]
-    return [item for sublist in read_errors for item in sublist]
-
-
-def __validate_sample_name_for_read(read: RawRead) -> List[str]:
-    # Sample names should contain only word chars [a-zA-Z0-9_]
-    invalid_chars = re.findall(r"\W", read.sample_name)
-    return ["Invalid chars %s found in sample name: %s" % (x, read.sample_name) for x in invalid_chars]
+    error_msgs = []
+    for read in spreadsheet.reads:
+        # Sample name should contain only word chars [a-zA-Z0-9_]
+        invalid_chars = re.findall(r"\W", read.sample_name)
+        error_msgs += ["Invalid char %s in sample name: %s" % (x, read.sample_name) for x in invalid_chars]
+    return error_msgs
 
 
 def validate_taxon_ids(spreadsheet: Spreadsheet) -> List[str]:
