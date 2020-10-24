@@ -13,7 +13,8 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
                   validate_no_path_in_filename,
                   validate_no_hyphen_in_filename,
                   validate_no_abnormal_characters_in_supplier_name,
-                  validate_sample_names
+                  validate_sample_names,
+                  validate_taxon_ids
                   ]
     if not download_reads_from_ena:
         validators.append(validate_files_are_compressed)
@@ -156,3 +157,14 @@ def __validate_sample_name_for_read(read: RawRead) -> List[str]:
     # Sample names should contain only word chars [a-zA-Z0-9_]
     invalid_chars = re.findall(r"\W", read.sample_name)
     return ["Invalid chars %s found in sample name: %s" % (x, read.sample_name) for x in invalid_chars]
+
+
+def validate_taxon_ids(spreadsheet: Spreadsheet) -> List[str]:
+    error_msgs = []
+    for read in spreadsheet.reads:
+        # Taxon ID should be an integer
+        try:
+            int(read.taxon_id)
+        except ValueError:
+            error_msgs.append("Taxon ID is not an integer: %s" % read.taxon_id)
+    return error_msgs
