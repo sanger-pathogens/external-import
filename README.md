@@ -12,15 +12,15 @@ A python3 library to parse external import spreadsheets
   * [Introduction](#introduction)
   * [Installation](#installation)
     * [Required dependencies](#required-dependencies)
-    * [From Source](#installing from source)
-    * [Docker](#installing with docker)
-  * [Uninstallation](#from-source)
+    * [From Source](#from-source)
+    * [Docker](#docker)
+  * [Uninstallation](#uninstallation)
   * [Usage](#usage)
   * [License](#license)
   * [Feedback/Issues](#feedbackissues)
 
 
-##Introduction
+## Introduction
 This software can be used to prepare data to be imported into the pathogen's pipelines. There are three steps to this process. 
 Validation is used to check over the manifest supplied by the user and check that the lanes have not already been imported. 
 The prepare step converts the spreadsheet supplied into the correct format. It can also split this spreadsheet if there are 
