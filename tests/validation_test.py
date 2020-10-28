@@ -3,10 +3,11 @@ from unittest.mock import patch
 
 from importer.pfchecks import output_directory_for_lanes_and_samples_exists, print_pf_checks
 from importer.model import Spreadsheet, RawRead
-from importer.validation import validate_study_name, validate_mandatory_read_fields, \
-    validate_files_are_compressed, validate_pair_naming_convention, validate_uniqueness_of_reads, \
-    validate_no_path_in_filename, validate_external_data_part_of_internal_sequencing_study_name, check_double_ended_column_is_T_or_F, \
-    validate_no_abnormal_characters_in_supplier_name, validate_no_hyphen_in_filename
+from importer.validation import (validate_study_name, validate_mandatory_read_fields,
+    validate_files_are_compressed, validate_pair_naming_convention, validate_uniqueness_of_reads,
+    validate_no_path_in_filename, validate_external_data_part_of_internal_sequencing_study_name,
+    check_double_ended_column_is_T_or_F, validate_no_abnormal_characters_in_supplier_name,
+    validate_no_hyphen_in_filename, validate_sample_names, validate_taxon_ids)
 
 
 class TestStudyNameContent(unittest.TestCase):
@@ -37,6 +38,54 @@ class TestStudyNameWhenPartOfInternalSequencing(unittest.TestCase):
     def test_valid_name_for_external_data_part_of_internal_study(self):
         self.assertEqual([], validate_external_data_part_of_internal_sequencing_study_name(
             Spreadsheet.new_instance("345_external", [])))
+
+
+class TestSampleNameContent(unittest.TestCase):
+
+    def test_sample_name_with_valid_char_should_pass_validation(self):
+        self.assertEqual([],
+                         validate_sample_names(
+                             Spreadsheet.new_instance("ValidName12345__",
+                                                      [RawRead(sample_accession=None,
+                                                               forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read='PAIR1_2.fastq.gz',
+                                                               sample_name="SAMPLE_1",
+                                                               taxon_id="1280",
+                                                               library_name='LIB1')])))
+
+    def test_sample_name_with_invalid_char_should_fail_validation(self):
+        self.assertEqual(34,
+                         len(validate_sample_names(
+                             Spreadsheet.new_instance("ValidName12345__",
+                                                      [RawRead(sample_accession=None,
+                                                               forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read='PAIR1_2.fastq.gz',
+                                                               sample_name="!\"£$%^&*()+={}[]:@~;'#?/>.<,|\\`¬\t ",
+                                                               taxon_id="1280",
+                                                               library_name='LIB1')]))))
+
+
+class TestValidateTaxonId(unittest.TestCase):
+
+    def test_valid_taxon_id(self):
+        self.assertEqual([],
+                         validate_taxon_ids(
+                             Spreadsheet.new_instance("ValidName12345__",
+                                                      [RawRead(sample_accession=None,
+                                                               forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read='PAIR1_2.fastq.gz',
+                                                               sample_name='SAMPLE1', taxon_id="1280",
+                                                               library_name='LIB1')])))
+
+    def test_invalid_taxon_id(self):
+        self.assertEqual(["Taxon ID is not an integer: invalid_taxon"],
+                         validate_taxon_ids(
+                             Spreadsheet.new_instance("ValidName12345__",
+                                                      [RawRead(sample_accession=None,
+                                                               forward_read='PAIR1_1.fastq.gz',
+                                                               reverse_read='PAIR1_2.fastq.gz',
+                                                               sample_name='SAMPLE1', taxon_id="invalid_taxon",
+                                                               library_name='LIB1')])))
 
 
 class TestValidateNoPathInFilename(unittest.TestCase):
