@@ -2,7 +2,7 @@ from os import mkdir, path
 from shutil import copyfile
 
 import sys
-import xlwt
+import openpyxl
 import pandas as pd
 
 from importer.model import Spreadsheet
@@ -87,8 +87,8 @@ class OutputSpreadsheetGenerator:
         self.spreadsheet = spreadsheet
         self.row = current_position
         self.status_closed = False
-        self.workbook = xlwt.Workbook()
-        self.sheet = self.workbook.add_sheet('Sheet1')
+        self.workbook = openpyxl.Workbook()
+        self.sheet = self.workbook.worksheets[0]
 
     def build(self, breakpoint: int, download):
         self.build_import_info()
@@ -98,19 +98,19 @@ class OutputSpreadsheetGenerator:
 
     def build_import_info(self):
 
-        self.write_string(0, 'Supplier Name', self.spreadsheet.supplier)
-        self.write_string(1, 'Supplier Organisation', self.spreadsheet.organisation)
-        self.write_string(2, 'Sanger Contact Name', self.spreadsheet.contact)
-        self.write_string(3, 'Sequencing Technology', self.spreadsheet.technology)
-        self.write_string(4, 'Study Name', self.spreadsheet.name)
-        self.write_string(5, 'Study Accession number', self.spreadsheet.accession)
-        self.write_string(6, 'Total size of files in GBytes', self.spreadsheet.size)
-        self.write_string(7, 'Data to be kept until', self.spreadsheet.limit)
+        self.write_string(1, 'Supplier Name', self.spreadsheet.supplier)
+        self.write_string(2, 'Supplier Organisation', self.spreadsheet.organisation)
+        self.write_string(3, 'Sanger Contact Name', self.spreadsheet.contact)
+        self.write_string(4, 'Sequencing Technology', self.spreadsheet.technology)
+        self.write_string(5, 'Study Name', self.spreadsheet.name)
+        self.write_string(6, 'Study Accession number', self.spreadsheet.accession)
+        self.write_string(7, 'Total size of files in GBytes', self.spreadsheet.size)
+        self.write_string(8, 'Data to be kept until', self.spreadsheet.limit)
 
 
     def build_read_data(self, breakpoint: int, download):
         for read in range(breakpoint):
-            position = read + 10
+            position = read + 11
             end_reached = self.row == len(self.spreadsheet.reads)
             if end_reached:
                 self.status_closed = True
@@ -119,22 +119,22 @@ class OutputSpreadsheetGenerator:
             if download:
                 if current_row.reverse_read == 'T':
                     forward_read_file = current_row.forward_read + '_1.fastq.gz'
-                    self.sheet.write(position, 0, forward_read_file)
+                    self.sheet.cell(row=position, column=1).value = forward_read_file
                     reverse_read_file = current_row.forward_read + '_2.fastq.gz'
-                    self.sheet.write(position, 1, reverse_read_file)
+                    self.sheet.cell(row=position, column=2).value = reverse_read_file
                 elif current_row.reverse_read == 'F':
                     forward_read_file = current_row.forward_read + '.fastq.gz'
-                    self.sheet.write(position, 0, forward_read_file)
-                    self.sheet.write(position, 1, '')
+                    self.sheet.cell(row=position, column=1).value = forward_read_file
+                    self.sheet.cell(row=position, column=2).value = ''
                 else:
                     print('WARNING: some lines have invalid entries for the double-ended column (not T/F)')
             else:
-                self.sheet.write(position, 0, current_row.forward_read)
+                self.sheet.cell(row=position, column=1).value = current_row.forward_read
                 if current_row.reverse_read is not None:
-                    self.sheet.write(position, 1, current_row.reverse_read)
-            self.sheet.write(position, 2, current_row.sample_name)
-            self.sheet.write(position, 4, current_row.taxon_id)
-            self.sheet.write(position, 5, current_row.library_name)
+                    self.sheet.cell(row=position, column=2).value = current_row.reverse_read
+            self.sheet.cell(row=position, column=3).value = current_row.sample_name
+            self.sheet.cell(row=position, column=5).value = current_row.taxon_id
+            self.sheet.cell(row=position, column=6).value = current_row.library_name
             self.row += 1
         if self.row == len(self.spreadsheet.reads):
             self.status_closed = True
@@ -143,12 +143,12 @@ class OutputSpreadsheetGenerator:
         index = 0
         for header in ['Filename', 'Mate File', 'Sample Name', 'Sample Accession number', 'Taxon ID', 'Library Name',
                        'Fragment Size', 'Read Count', 'Base Count', 'Comments']:
-            self.sheet.write(9, index, header)
+            self.sheet.cell(row=10, column=(index+1)).value = header
             index += 1
 
     def not_applicable(self, row, title):
         self.write_string(row, title, 'Unused field')
 
     def write_string(self, row, title, value):
-        self.sheet.write(row, 0, title)
-        self.sheet.write(row, 1, value)
+        self.sheet.cell(row=row, column=1).value = title
+        self.sheet.cell(row=row, column=2).value = value
