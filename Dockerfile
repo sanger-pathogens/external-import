@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 WORKDIR /opt
 
 ARG EXTERNAL_IMPORT_BUILD_DIR=external-import
-ARG ENA_BROWSER_TOOLS_VERSION=1.5.5
+ARG ENA_BROWSER_TOOLS_VERSION=1.6
 
 RUN apt update -qq -y && \
     apt install -y \
