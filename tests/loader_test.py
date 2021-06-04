@@ -17,7 +17,7 @@ class TestLoader(unittest.TestCase):
                                             contact="Some Name", organisation="ENA", supplier='ENA',
                                             technology='Illumina', size=123456.0, accession='accession',
                                             limit='30/09/2020')
-        actual = loader.load()
+        actual = loader.load_xls()
         self.assertSpreadsheet(expected, actual)
 
     def test_header_initialization_no_reverse_read(self):
@@ -29,7 +29,7 @@ class TestLoader(unittest.TestCase):
                                             contact="Some Name", organisation="ENA", supplier='ENA',
                                             technology='Illumina', size=123456.0, accession='accession',
                                             limit='30/09/2020')
-        actual = loader.load()
+        actual = loader.load_xls()
         self.assertSpreadsheet(expected, actual)
 
     def test_header_initialization_no_library_name(self):
@@ -41,7 +41,7 @@ class TestLoader(unittest.TestCase):
                                             contact="Some Name", organisation="ENA", supplier='ENA',
                                             technology='Illumina', size=123456.0, accession='accession',
                                             limit='30/09/2020')
-        actual = loader.load()
+        actual = loader.load_xls()
         self.assertSpreadsheet(expected, actual)
 
     def test_header_initialization_no_accession(self):
@@ -53,7 +53,7 @@ class TestLoader(unittest.TestCase):
                                             contact="Some Name", organisation="ENA", supplier='ENA',
                                             technology='Illumina', size=123456.0, accession=None,
                                             limit='30/09/2020')
-        actual = loader.load()
+        actual = loader.load_xls()
         self.assertSpreadsheet(expected, actual)
 
     def test_sample_and_library_names_as_integers(self):
@@ -67,7 +67,7 @@ class TestLoader(unittest.TestCase):
                                             contact="Me", organisation="Org", supplier='Supplier',
                                             technology='Illumina', size=1.90, accession=None,
                                             limit='01/01/2025')
-        actual = loader.load()
+        actual = loader.load_xls()
         self.assertSpreadsheet(expected, actual)
 
     def test_no_filename_only_run_accession(self):
@@ -76,11 +76,23 @@ class TestLoader(unittest.TestCase):
         expected = Spreadsheet.new_instance("MyStudy", [
             self._raw_read('PAIR1', 'T', 'SAMPLE1', 'LIB1', 'ACCESSION1'),
             self._raw_read('PAIR2', 'T', 'SAMPLE2', 'LIB2', 'ACCESSION2'),
-            self._raw_read('PAIR3', 'F', 'SAMPLE3','LIB3','ACCESSION3')],
+            self._raw_read('PAIR3', 'F', 'SAMPLE3', 'LIB3', 'ACCESSION3')],
                                             contact="Some Name", organisation="ENA", supplier='ENA',
                                             technology='Illumina', size=123456.0, accession='accession',
                                             limit='30/09/2020')
-        actual = loader.load()
+        actual = loader.load_xls()
+        self.assertSpreadsheet(expected, actual)
+
+    def test_cells_read_xlsx(self):
+        loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_upload.xlsx'))
+
+        expected = Spreadsheet.new_instance("MyStudy", [
+            self._raw_read('PAIR1_1.fastq.gz', 'PAIR1_2.fastq.gz', 'SAMPLE1', 'LIB1', 'ACCESSION1'),
+            self._raw_read('PAIR2_1.fastq.gz', 'PAIR2_2.fastq.gz', 'SAMPLE2', 'LIB2', 'ACCESSION2')],
+                                            contact="Some Name", organisation="ENA", supplier='ENA',
+                                            technology='Illumina', size=123456.0, accession='accession',
+                                            limit='30/09/2020')
+        actual = loader.load_xlsx()
         self.assertSpreadsheet(expected, actual)
 
     def assertSpreadsheet(self, expected, actual):

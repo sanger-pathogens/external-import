@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch, call
 import os
 import xlrd
+import openpyxl
 from importer.model import Spreadsheet, RawRead
 from importer.writer import Preparation, OutputSpreadsheetGenerator, create_commands, submit_commands
 import pandas as pd
@@ -200,17 +201,17 @@ class TestXlsGeneration(unittest.TestCase):
         sheet = self.make_spreadsheet_for_copy()
         self.run_function(sheet)
         self.run_workbook_assertions()
-        os.remove('workbook.xls')
+        os.remove('workbook.xlsx')
 
     def test_of_OutputSpreadsheetGenerator_for_download(self):
         sheet = self.make_spreadsheet_for_ena_download()
         self.run_function(sheet)
         self.run_workbook_assertions()
-        os.remove('workbook.xls')
+        os.remove('workbook.xlsx')
 
     def run_workbook_assertions(self):
-        WORKBOOK_UNDER_TEST = xlrd.open_workbook('workbook.xls')
-        SHEET_UNDER_TEST = WORKBOOK_UNDER_TEST.sheet_by_index(0)
+        WORKBOOK_UNDER_TEST = openpyxl.load_workbook('workbook.xlsx')
+        SHEET_UNDER_TEST = WORKBOOK_UNDER_TEST['Sheet']
         BREAKPOINT_SPREADSHEET = xlrd.open_workbook(os.path.join(self.data_dir, 'test_breakpoint_functionality.xls'))
         BREAKPOINT_FIRSTSHEET = BREAKPOINT_SPREADSHEET.sheet_by_index(0)
         for row in range(10):
@@ -224,15 +225,17 @@ class TestXlsGeneration(unittest.TestCase):
                         day = '0' + str(day)
                     if month < 10:
                         month = '0' + str(month)
-                    self.assertEqual(SHEET_UNDER_TEST.cell_value(row, col), f'{day}/{month}/{year}')
+                    self.assertEqual(SHEET_UNDER_TEST.cell(row=row+1, column=col+1).value, f'{day}/{month}/{year}')
+                elif BREAKPOINT_FIRSTSHEET.cell_value(row, col) == '':
+                    self.assertEqual(SHEET_UNDER_TEST.cell(row=row + 1, column=col + 1).value, None)
                 else:
-                    self.assertEqual(SHEET_UNDER_TEST.cell_value(row, col),
+                    self.assertEqual(SHEET_UNDER_TEST.cell(row=row+1, column=col+1).value,
                                      BREAKPOINT_FIRSTSHEET.cell_value(row, col))
 
     def run_function(self, sheet):
         generator = OutputSpreadsheetGenerator(sheet, A_POSITION)
         workbook, file_ended, current_position = generator.build(A_BREAKPOINT, False)
-        workbook.save('workbook.xls')
+        workbook.save('workbook.xlsx')
         self.assertEqual((current_position, file_ended), (2, True))
         return current_position, file_ended
 
