@@ -19,6 +19,7 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
     if not download_reads_from_ena:
         validators.append(validate_files_are_compressed)
         validators.append(validate_pair_naming_convention)
+        validators.append(validate_files_correctly_marked)
     else:
         validators.append(check_double_ended_column_is_T_or_F)
     if part_of_internal_study:
@@ -79,6 +80,18 @@ def __validate_files_are_compressed_for_read(read: RawRead) -> List[str]:
             result.append("Reverse read file is not correctly formatted for %s" % str(read))
     return result
 
+def validate_files_correctly_marked(spreadsheet: Spreadsheet) -> List[str]:
+    read_errors = [__validate_files_have_no_duplicate_direction_markers(read) for read in spreadsheet.reads]
+    return [item for sublist in read_errors for item in sublist]
+
+def __validate_files_have_no_duplicate_direction_markers(read: RawRead) -> List[str]:
+    result = []
+    if read.reverse_read:
+        if read.forward_read.endswith("_1_1.fastq.gz"):
+            result.append("Forward read file contains to many forward read markers for %s" % str(read))
+        if read.reverse_read.endswith("_2_2.fastq.gz"):
+            result.append("Reverse read file contains to many reverse read markers for %s" % str(read))
+    return result
 
 def validate_pair_naming_convention(spreadsheet: Spreadsheet) -> List[str]:
     read_errors = [__validate_pair_naming_convention_for_read(read) for read in spreadsheet.reads]
@@ -154,6 +167,8 @@ def validate_sample_names(spreadsheet: Spreadsheet) -> List[str]:
         # Sample name should contain only word chars [a-zA-Z0-9_]
         invalid_chars = re.findall(r"\W", read.sample_name)
         error_msgs += ["Invalid char %s in sample name: %s" % (x, read.sample_name) for x in invalid_chars]
+        if len(read.sample_name) > 39:
+            error_msgs += ["Sample name exceeds character limit (40) in sample name: %s" % (read.sample_name)]
     return error_msgs
 
 
