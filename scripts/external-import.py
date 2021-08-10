@@ -32,6 +32,18 @@ def prepare(arguments: argparse.Namespace):
         sheet = loader.load_xls()
 
     ### Run iterable for length of reads from here
+    generator = OutputSpreadsheetGenerator(sheet, 0)
+    workbook = generator.build(0, arguments.download)
+    preparation = Preparation.new_instance_complete(sheet, arguments.output, arguments.ticket)
+    preparation.create_destination_directory()
+    preparation.save_workbook(workbook)
+    if arguments.download:
+        preparation.download_files_from_ena(connections=arguments.connections)
+
+    else:
+        preparation.copy_files(arguments.input)
+
+def split_spreadsheet_by_breakpoint(sheet,arguments):
     file_ended = False
     instance = 0
     current_position = 0
@@ -42,14 +54,15 @@ def prepare(arguments: argparse.Namespace):
         preparation.create_destination_directory()
         preparation.save_workbook(workbook)
         instance += 1
-    if arguments.download:
-        preparation.download_files_from_ena(connections=arguments.connections)
-
-    else:
-        preparation.copy_files(arguments.input)
-
 
 def load(arguments: argparse.Namespace):
+    # Split complete spreadsheet by breakpoint
+    complete_spreadsheet = DataImporter.get_complete_manifest_for_ticket(arguments.ticket)
+    loader = SpreadsheetLoader(complete_spreadsheet)
+    sheet = loader.load_xls()
+    split_spreadsheet_by_breakpoint(sheet, arguments)
+
+    # Do load
     importer = DataImporter.new_instance(arguments.output, arguments.ticket, arguments.database)
     DataImporter.load(importer, arguments.commands)
 
