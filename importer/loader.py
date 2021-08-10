@@ -87,6 +87,12 @@ class SpreadsheetLoader:
                     self.__extract_text_value_xls(i, sample_accession_column),
                     self.__extract_float_value_xls(i, taxon_id_column),
                     library_name))
+            blank_reads = True
+            while blank_reads:
+                if reads[-1].forward_read == None and reads[-1].reverse_read == None and reads[-1].sample_name == None:
+                    reads = reads[:-1]
+                else:
+                    blank_reads = False
         result.reads = reads
         return result
 
