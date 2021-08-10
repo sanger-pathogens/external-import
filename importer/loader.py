@@ -162,16 +162,23 @@ class SpreadsheetLoader:
         return result
 
     def __extract_text_value_xlsx(self, row, column):
-        new_data = self._sheet.cell(row=row, column=column).value.strip()
+        new_data = self._sheet.cell(row=row, column=column).value
+        if new_data is None:
+            return None
+        new_data = str(new_data).strip()
         return None if new_data == '' else new_data
 
     def __extract_float_value_xlsx(self, row, column):
         if isinstance(self._sheet.cell(row=row, column=column).value, str):
             return self.__extract_text_value_xlsx(row, column)
-        return str(int(self._sheet.cell(row=row, column=column).value))
+        value = self._sheet.cell(row=row, column=column).value
+        return None if value is None else str(int(value))
 
     def __extract_text_value_xls(self, row, column):
-        new_data = self._sheet.cell_value(row, column).strip()
+        new_data = self._sheet.cell_value(row, column)
+        if new_data is None:
+            return None
+        new_data = str(new_data).strip()
         return None if new_data == '' else new_data
 
     def __extract_float_value_xls(self, row, column):

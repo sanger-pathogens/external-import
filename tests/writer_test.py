@@ -25,7 +25,7 @@ class TestFileCopy(unittest.TestCase):
             RawRead(forward_read='PAIR2_1.fastq.gz', reverse_read='PAIR2_2.fastq.gz', sample_name='SAMPLE2',
                     taxon_id='1280', library_name='LIB2', sample_accession=None)]), 'destination', 0, 0)
         under_test.copy_files('source')
-        self.assertEquals(copyfile_patch.call_args_list,
+        self.assertEqual(copyfile_patch.call_args_list,
                           [call('source/PAIR1_1.fastq.gz', 'destination/0/PAIR1_1.fastq.gz'),
                            call('source/PAIR1_2.fastq.gz', 'destination/0/PAIR1_2.fastq.gz'),
                            call('source/PAIR2_1.fastq.gz', 'destination/0/PAIR2_1.fastq.gz'),
@@ -39,7 +39,7 @@ class TestFileCopy(unittest.TestCase):
             RawRead(forward_read='SINGLE.fastq.gz', reverse_read=None, sample_name='SAMPLE2',
                     taxon_id='1280', library_name='LIB2', sample_accession=None)]), 'destination', 0, 0)
         under_test.copy_files('source')
-        self.assertEquals(copyfile_patch.call_args_list,
+        self.assertEqual(copyfile_patch.call_args_list,
                           [call('source/PAIR1_1.fastq.gz', 'destination/0/PAIR1_1.fastq.gz'),
                            call('source/PAIR1_2.fastq.gz', 'destination/0/PAIR1_2.fastq.gz'),
                            call('source/SINGLE.fastq.gz', 'destination/0/SINGLE.fastq.gz')])

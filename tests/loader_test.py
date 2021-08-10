@@ -95,6 +95,32 @@ class TestLoader(unittest.TestCase):
         actual = loader.load_xlsx()
         self.assertSpreadsheet(expected, actual)
 
+    def test_cell_formats_xls(self):
+        loader = SpreadsheetLoader(os.path.join(self.data_dir, 'cell_formats.xls'))
+        expected = Spreadsheet.new_instance("AStudyName1", [
+            self._raw_read('ERR0000001_1.fastq.gz', 'ERR0000001_2.fastq.gz', 'some_name', '1000000001', 'ERR0000001','485'),
+            self._raw_read('ERR0000002_1.fastq.gz', 'ERR0000002_2.fastq.gz', '12345', '2000000002', 'ERR0000002','485'),
+            self._raw_read('ERR0000003_1.fastq.gz', 'ERR0000003_2.fastq.gz', '6789', '2000000002', 'ERR0000002','485'),
+            self._raw_read('ERR0000004_1.fastq.gz', 'ERR0000004_2.fastq.gz', None, '1000000001', 'ERR0000002','485')],
+                                            contact="Me", organisation="Org", supplier='Supplier',
+                                            technology='Illumina', size=1.90, accession=None,
+                                            limit='01/01/2025')
+        actual = loader.load_xls()
+        self.assertSpreadsheet(expected, actual)
+
+    def test_cell_formats_xlsx(self):
+        loader = SpreadsheetLoader(os.path.join(self.data_dir, 'cell_formats.xlsx'))
+        expected = Spreadsheet.new_instance("AStudyName1", [
+            self._raw_read('ERR0000001_1.fastq.gz', 'ERR0000001_2.fastq.gz', 'some_name', '1000000001', 'ERR0000001','485'),
+            self._raw_read('ERR0000002_1.fastq.gz', 'ERR0000002_2.fastq.gz', '12345', '2000000002', 'ERR0000002','485'),
+            self._raw_read('ERR0000003_1.fastq.gz', 'ERR0000003_2.fastq.gz', '6789', '2000000002', 'ERR0000002','485'),
+            self._raw_read('ERR0000004_1.fastq.gz', 'ERR0000004_2.fastq.gz', None, '1000000001', 'ERR0000002','485')],
+                                            contact="Me", organisation="Org", supplier='Supplier',
+                                            technology='Illumina', size=1.90, accession=None,
+                                            limit='01/01/2025')
+        actual = loader.load_xlsx()
+        self.assertSpreadsheet(expected, actual)
+
     def assertSpreadsheet(self, expected, actual):
         self.maxDiff = None
         self.assertEqual(expected.__dict__, actual.__dict__)
