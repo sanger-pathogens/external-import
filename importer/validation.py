@@ -167,7 +167,7 @@ def validate_sample_names(spreadsheet: Spreadsheet) -> List[str]:
         # Sample name should contain only word chars [a-zA-Z0-9_]
         invalid_chars = re.findall(r"\W", read.sample_name)
         error_msgs += ["Invalid char %s in sample name: %s" % (x, read.sample_name) for x in invalid_chars]
-        if len(read.sample_name) > 39:
+        if len(read.sample_name) > 40:
             error_msgs += ["Sample name exceeds character limit (40) in sample name: %s" % (read.sample_name)]
     return error_msgs
 
