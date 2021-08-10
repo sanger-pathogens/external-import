@@ -376,12 +376,8 @@ class TestReadsAreCompressed(unittest.TestCase):
                                                                library_name='LIB1')])))
 
     def test_reads_are_not_double_ended(self):
-        self.assertEqual(["Forward read file contains to many forward read markers for RawRead(forward_read='PAIR1_1_1.fastq.gz', "
-                          "reverse_read='PAIR1_2_2.fastq.gz', sample_name='SAMPLE1', sample_accession=None, "
-                          "taxon_id='1280', library_name='LIB1')",
-                          "Reverse read file contains to many reverse read markers for RawRead(forward_read='PAIR1_1_1.fastq.gz', "
-                          "reverse_read='PAIR1_2_2.fastq.gz', sample_name='SAMPLE1', sample_accession=None, "
-                          "taxon_id='1280', library_name='LIB1')"],
+        self.assertEqual(["Too many forward read markers '_1' in forward read filename: PAIR1_1_1.fastq.gz",
+                          "Too many reverse read markers '_2' in reverse read filename: PAIR1_2_2.fastq.gz"],
                          validate_files_correctly_marked(
                              Spreadsheet.new_instance("1234567890123456",
                                                       [RawRead(sample_accession=None, forward_read='PAIR1_1_1.fastq.gz',
