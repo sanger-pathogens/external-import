@@ -13,10 +13,7 @@ from importer.writer import Preparation, \
 
 def validate(arguments: argparse.Namespace):
     loader = SpreadsheetLoader(arguments.spreadsheet)
-    if loader._format == 'xlsx':
-        sheet = loader.load_xlsx()
-    else:
-        sheet = loader.load_xls()
+    sheet = loader.load()
     result = validate_spreadsheet(sheet, arguments.part_of_internal_study, arguments.download)
     if result:
         print(result)
@@ -26,12 +23,8 @@ def validate(arguments: argparse.Namespace):
 
 def prepare(arguments: argparse.Namespace):
     loader = SpreadsheetLoader(arguments.spreadsheet)
-    if loader._format == 'xlsx':
-        sheet = loader.load_xlsx()
-    else:
-        sheet = loader.load_xls()
+    sheet = loader.load()
 
-    ### Run iterable for length of reads from here
     generator = OutputSpreadsheetGenerator(sheet, 0)
     workbook = generator.build(0, arguments.download)
     preparation = Preparation.new_instance_complete(sheet, arguments.output, arguments.ticket)
