@@ -52,7 +52,7 @@ def load(arguments: argparse.Namespace):
     # Split complete spreadsheet by breakpoint
     complete_spreadsheet = DataImporter.get_complete_manifest_for_ticket(arguments.ticket)
     loader = SpreadsheetLoader(complete_spreadsheet)
-    sheet = loader.load_xls()
+    sheet = loader.load()
     split_spreadsheet_by_breakpoint(sheet, arguments)
 
     # Do load
