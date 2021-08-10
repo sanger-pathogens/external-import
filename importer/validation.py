@@ -90,7 +90,7 @@ def __validate_files_have_no_duplicate_direction_markers(read: RawRead) -> List[
         if read.forward_read.endswith("_1_1.fastq.gz"):
             result.append("Too many forward read markers '_1' in forward read filename: %s" % read.forward_read)
         if read.reverse_read.endswith("_2_2.fastq.gz"):
-            result.append("Reverse read file contains to many reverse read markers for %s" % str(read))
+            result.append("Too many reverse read markers '_2' in reverse read filename: %s" % read.reverse_read)
     return result
 
 def validate_pair_naming_convention(spreadsheet: Spreadsheet) -> List[str]:
