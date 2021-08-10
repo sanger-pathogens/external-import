@@ -45,16 +45,15 @@ class TestPrepareCommandArguments(unittest.TestCase):
         self.under_test = ArgumentParser(prepare=self.preparation_function)
 
     def test_should_parse_valid_arguments_copy_input(self):
-        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123",
-                                        "-b", "456"])
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123"])
         expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=456, connections=10, download=False)
+                                      spreadsheet="test_upload.xls", ticket=123, connections=10, download=False)
         self.assertEqual(actual, expected)
 
     def test_should_parse_valid_arguments_download_ENA(self):
         actual = self.under_test.parse(["prepare", "-dl", "-c", "50", "-s", "test_upload.xls", "-o", "output", "-t", "123"])
         expected = argparse.Namespace(output='output', input=None, execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=0, connections=50,
+                                      spreadsheet="test_upload.xls", ticket=123, connections=50,
                                       download=True)
         self.assertEqual(actual, expected)
 
@@ -88,21 +87,15 @@ class TestPrepareCommandArguments(unittest.TestCase):
             ["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-b", "invalid_break"])
         self.assertIsNone(actual)
 
-    def test_breakpoint_defaults_to_0(self):
-        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123"])
-        expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=0, connections=10, download=False)
-        self.assertEqual(actual, expected)
-
     def test_connections_is_a_number(self):
         actual = self.under_test.parse(
             ["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-c", "invalid_number_of_connections"])
         self.assertIsNone(actual)
 
     def test_connections_defaults_to_10(self):
-        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123", "-b","10"])
+        actual = self.under_test.parse(["prepare", "-s", "test_upload.xls", "-i", "input", "-o", "output", "-t", "123"])
         expected = argparse.Namespace(output='output', input='input', execute=self.preparation_function,
-                                      spreadsheet="test_upload.xls", ticket=123, breakpoint=10,connections=10, download=False)
+                                      spreadsheet="test_upload.xls", ticket=123, connections=10, download=False)
         self.assertEqual(actual, expected)
 
     def test_connections_cant_be_0(self):
@@ -123,9 +116,15 @@ class TestImportCommandArguments(unittest.TestCase):
         self.under_test = ArgumentParser(load=self.import_function)
 
     def test_should_parse_valid_arguments(self):
+        actual = self.under_test.parse(["load", "-d", "a_database", "-o", "output", "-t", "123", "-c", "commands_dir","-b","10"])
+        expected = argparse.Namespace(output='output', database='a_database', commands='commands_dir',
+                                      execute=self.import_function, ticket=123, breakpoint=10)
+        self.assertEqual(actual, expected)
+
+    def test_breakpoint_defaults_to_0(self):
         actual = self.under_test.parse(["load", "-d", "a_database", "-o", "output", "-t", "123", "-c", "commands_dir"])
         expected = argparse.Namespace(output='output', database='a_database', commands='commands_dir',
-                                      execute=self.import_function, ticket=123)
+                                      execute=self.import_function, ticket=123, breakpoint=0)
         self.assertEqual(actual, expected)
 
     def test_commands_is_mandatory(self):
