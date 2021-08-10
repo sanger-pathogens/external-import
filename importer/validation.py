@@ -88,7 +88,7 @@ def __validate_files_have_no_duplicate_direction_markers(read: RawRead) -> List[
     result = []
     if read.reverse_read:
         if read.forward_read.endswith("_1_1.fastq.gz"):
-            result.append("Forward read file contains to many forward read markers for %s" % str(read))
+            result.append("Too many forward read markers '_1' in forward read filename: %s" % read.forward_read)
         if read.reverse_read.endswith("_2_2.fastq.gz"):
             result.append("Reverse read file contains to many reverse read markers for %s" % str(read))
     return result
