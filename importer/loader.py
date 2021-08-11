@@ -1,7 +1,27 @@
 import openpyxl
 import xlrd
+from collections import namedtuple
 
-from importer.model import Spreadsheet, RawRead
+RawRead = namedtuple('RawRead', 'forward_read, reverse_read, sample_name, sample_accession, taxon_id, library_name')
+
+
+class Spreadsheet:
+
+    @staticmethod
+    def new_instance(name, reads=[], accession='', contact='', organisation='', size=0, supplier='', technology='',
+                     limit=''):
+        result = Spreadsheet()
+        result.name = name
+        result.reads = reads
+        result.accession = accession
+        result.contact = contact
+        result.organisation = organisation
+        result.size = size
+        result.supplier = supplier
+        result.technology = technology
+        result.limit = limit
+        return result
+
 
 
 class SpreadsheetLoader:
@@ -87,8 +107,21 @@ class SpreadsheetLoader:
                     self.__extract_text_value_xls(i, sample_accession_column),
                     self.__extract_float_value_xls(i, taxon_id_column),
                     library_name))
+            reads = self.trim_blank_ends(reads)
+        print(reads)
         result.reads = reads
         return result
+
+    @staticmethod
+    def trim_blank_ends(reads):
+        blank_reads = True
+        while blank_reads:
+            if reads[-1].forward_read == None and reads[-1].reverse_read == None and reads[-1].sample_name == None \
+                    and reads[-1].sample_accession == None:
+                reads = reads[:-1]
+            else:
+                blank_reads = False
+        return reads
 
     def load_xlsx(self):
         result = Spreadsheet()
@@ -158,6 +191,7 @@ class SpreadsheetLoader:
                     self.__extract_text_value_xlsx(i, sample_accession_column),
                     self.__extract_float_value_xlsx(i, taxon_id_column),
                     library_name))
+            reads = self.trim_blank_ends(reads)
         result.reads = reads
         return result
 
@@ -185,3 +219,7 @@ class SpreadsheetLoader:
         if self._sheet.cell_type(row, column) != xlrd.XL_CELL_NUMBER:
             return self.__extract_text_value_xls(row, column)
         return str(int(self._sheet.cell_value(row, column)))
+
+if __name__ == '__main__':
+    loader = SpreadsheetLoader('~/Downloads/CHRF_ena_download_template.xls')
+    loader.load_xls()

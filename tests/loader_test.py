@@ -7,6 +7,28 @@ from importer.model import Spreadsheet, RawRead
 
 class TestLoader(unittest.TestCase):
     data_dir = os.path.dirname(os.path.abspath(__file__))
+    missing_obligatory_error_reads = [RawRead(forward_read='fw_read', reverse_read='rv_read', sample_name='sampname', sample_accession='sampac', taxon_id='taxid', library_name='libnam'),
+                   RawRead(forward_read=None, reverse_read=None, sample_name=None, sample_accession=None, taxon_id='filled', library_name='filled'),
+                   RawRead(forward_read=None, reverse_read=None, sample_name=None, sample_accession=None, taxon_id='filled', library_name='filled')]
+    reads_with_obligatory_data = [RawRead(forward_read='fw_read', reverse_read='rv_read', sample_name='sampname', sample_accession='sampac', taxon_id='taxid', library_name='libnam'),
+                  RawRead(forward_read='fw_read', reverse_read='rv_read', sample_name='sampname', sample_accession='sampac', taxon_id='taxid', library_name='libnam')]
+
+    def test_empty_end_lanes_trimmed(self):
+        loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_upload.xls'))
+
+        expected = [self._raw_read('fw_read', 'rv_read', 'sampname', 'libnam', 'sampac', 'taxid')]
+
+        actual = loader.trim_blank_ends(self.missing_obligatory_error_reads)
+        self.assertEqual(expected, actual)
+
+    def test_non_empty_lanes_not_trimmed(self):
+        loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_upload.xls'))
+
+        expected = [self._raw_read('fw_read', 'rv_read', 'sampname', 'libnam', 'sampac', 'taxid'),
+                    self._raw_read('fw_read', 'rv_read', 'sampname', 'libnam', 'sampac', 'taxid')]
+
+        actual = loader.trim_blank_ends(self.reads_with_obligatory_data)
+        self.assertEqual(expected, actual)
 
     def test_header_initialization(self):
         loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_upload.xls'))
