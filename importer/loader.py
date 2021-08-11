@@ -36,6 +36,12 @@ class SpreadsheetLoader:
             self._workbook = xlrd.open_workbook(self._file)
             self._sheet = self._workbook.sheet_by_index(0)
             self._format = 'xls'
+    
+    def load(self):
+        if self._format == 'xlsx':
+            return self.load_xlsx()
+        else:
+            return self.load_xls()
 
     def load_xls(self):
         result = Spreadsheet()

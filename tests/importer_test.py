@@ -13,7 +13,7 @@ COMMAND_3 = DataImporter('base/123', 123, 2, 'database')
 COMMANDS = [COMMAND_1, COMMAND_2, COMMAND_3]
 
 def glob_replacer(ticket_string, recursive):
-    if ticket_string != f'/lustre/scratch118/infgen/pathogen/pathpipe/external_seq_data/{TICKET}/external_{TICKET}_*.xls':
+    if ticket_string != f'{DataImporter.BASE_DATA_PATH}/{TICKET}/external_{TICKET}_*.xls':
         raise Exception('Ticket lost in transfer.')
     elif recursive != False:
         raise Exception('Recursive not set to false.')
@@ -31,7 +31,7 @@ class importerTesting(unittest.TestCase):
                 self.assertEqual(CREATED_COMMAND.database, COMMANDS[MATCHING_COMMAND].database)
                 self.assertEqual(CREATED_COMMAND.ticket, COMMANDS[MATCHING_COMMAND].ticket)
                 self.assertEqual(CREATED_COMMAND.index, COMMANDS[MATCHING_COMMAND].index)
-            glob_mock.assert_called_once_with('/lustre/scratch118/infgen/pathogen/pathpipe/external_seq_data/123/external_123_*.xls', recursive=False)
+            glob_mock.assert_called_once_with(f'{DataImporter.BASE_DATA_PATH}/123/external_123_*.xls', recursive=False)
 
 
     def test_importer_printout(self):
