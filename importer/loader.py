@@ -114,7 +114,6 @@ class SpreadsheetLoader:
                     self.__extract_float_value_xls(i, taxon_id_column),
                     library_name))
             reads = self.trim_blank_ends(reads)
-        print(reads)
         result.reads = reads
         return result
 
