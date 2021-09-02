@@ -26,7 +26,7 @@ def prepare(arguments: argparse.Namespace):
     sheet = loader.load()
 
     generator = OutputSpreadsheetGenerator(sheet, 0)
-    workbook = generator.build(0, arguments.download)
+    workbook, file_ended, current_position = generator.build(0, arguments.download)
     preparation = Preparation.new_instance_complete(sheet, arguments.output, arguments.ticket)
     preparation.create_destination_directory()
     preparation.save_workbook(workbook)
