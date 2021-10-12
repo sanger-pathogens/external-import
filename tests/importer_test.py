@@ -13,7 +13,7 @@ COMMAND_3 = DataImporter('base/123', 123, 2, 'database')
 COMMANDS = [COMMAND_1, COMMAND_2, COMMAND_3]
 
 def glob_replacer(ticket_string, recursive):
-    if ticket_string != f'{DataImporter.BASE_DATA_PATH}/{TICKET}/external_{TICKET}_*.xls':
+    if ticket_string != f'{DataImporter.BASE_DATA_PATH}/{TICKET}/external_{TICKET}_*.xlsx':
         raise Exception('Ticket lost in transfer.')
     elif recursive != False:
         raise Exception('Recursive not set to false.')
@@ -31,7 +31,7 @@ class importerTesting(unittest.TestCase):
                 self.assertEqual(CREATED_COMMAND.database, COMMANDS[MATCHING_COMMAND].database)
                 self.assertEqual(CREATED_COMMAND.ticket, COMMANDS[MATCHING_COMMAND].ticket)
                 self.assertEqual(CREATED_COMMAND.index, COMMANDS[MATCHING_COMMAND].index)
-            glob_mock.assert_called_once_with(f'{DataImporter.BASE_DATA_PATH}/123/external_123_*.xls', recursive=False)
+            glob_mock.assert_called_once_with(f'{DataImporter.BASE_DATA_PATH}/123/external_123_*.xlsx', recursive=False)
 
 
     def test_importer_printout(self):
@@ -45,7 +45,7 @@ class importerTesting(unittest.TestCase):
             f'  -d {DATABASE} \\\n',
             f'  -f {OUTPUT}/{TICKET} \\\n',
             f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
-            f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xls\n",
+            f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xlsx\n",
             '\n',
             '\n',
             f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}.%J.%I.o -e {OUTPUT}/{TICKET}/external_{TICKET}.%J.%I.e -M2000 \\\n',
@@ -55,7 +55,7 @@ class importerTesting(unittest.TestCase):
             f'  -d {DATABASE} \\\n',
             f'  -f {OUTPUT}/{TICKET} \\\n',
             f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
-            f"  {OUTPUT}/{TICKET}/external_{TICKET}_\$LSB_JOBINDEX.xls\n",
+            f"  {OUTPUT}/{TICKET}/external_{TICKET}_\$LSB_JOBINDEX.xlsx\n",
             '\n',
             '\n',
             '# Then following the external data import SOP to register the study\n',
@@ -81,7 +81,7 @@ class importerTesting(unittest.TestCase):
             f'  -d {DATABASE} \\\n',
             f'  -f {OUTPUT}/{TICKET} \\\n',
             f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
-            f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xls\n",
+            f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xlsx\n",
             '\n',
             '\n',
             f'bsub -o {OUTPUT}/{TICKET}/external_{TICKET}.%J.%I.o -e {OUTPUT}/{TICKET}/external_{TICKET}.%J.%I.e -M2000 \\\n',
@@ -91,7 +91,7 @@ class importerTesting(unittest.TestCase):
             f'  -d {DATABASE} \\\n',
             f'  -f {OUTPUT}/{TICKET} \\\n',
             f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
-            f"  {OUTPUT}/{TICKET}/external_{TICKET}_\$LSB_JOBINDEX.xls\n",
+            f"  {OUTPUT}/{TICKET}/external_{TICKET}_\$LSB_JOBINDEX.xlsx\n",
             '\n',
             '\n',
             '# Then following the external data import SOP to register the study\n',
@@ -117,7 +117,7 @@ class importerTesting(unittest.TestCase):
             f'  -d {DATABASE} \\\n',
             f'  -f {OUTPUT}/{TICKET} \\\n',
             f'  -p /lustre/scratch118/infgen/pathogen/pathpipe/{DATABASE}/seq-pipelines \\\n',
-            f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xls\n",
+            f"  {OUTPUT}/{TICKET}/external_{TICKET}_0.xlsx\n",
             '\n',
             '\n',
             '# Then following the external data import SOP to register the study\n',
