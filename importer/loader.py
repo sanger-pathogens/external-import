@@ -28,15 +28,15 @@ class SpreadsheetLoader:
 
     def __init__(self, file):
         self._file = file
-        try:
+        if file.lower().endswith(".xlsx"):
+            self._format = 'xlsx'
             self._workbook = openpyxl.load_workbook(self._file)
             self._sheet = self._workbook.worksheets[0]
-            self._format = 'xlsx'
-        except:
+        else:
+            self._format = 'xls'
             self._workbook = xlrd.open_workbook(self._file)
             self._sheet = self._workbook.sheet_by_index(0)
-            self._format = 'xls'
-    
+
     def load(self):
         if self._format == 'xlsx':
             return self.load_xlsx()

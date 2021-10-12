@@ -267,4 +267,4 @@ class TestXlsGeneration(unittest.TestCase):
     def assert_preparation(self, preparation, spreadsheet):
         self.assertEqual(preparation.destination, AN_OUTPUT + '/' + str(A_TICKET))
         self.assertEqual(preparation.spreadsheet, spreadsheet)
-        self.assertEqual(preparation.spreadsheet_file, (AN_OUTPUT + '/'+ str(A_TICKET) +'/external_' + str(A_TICKET) + '_' + str(AN_INSTANCE) + '.xls'))
+        self.assertEqual(preparation.spreadsheet_file, (AN_OUTPUT + '/'+ str(A_TICKET) +'/external_' + str(A_TICKET) + '_' + str(AN_INSTANCE) + '.xlsx'))
