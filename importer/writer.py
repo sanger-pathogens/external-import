@@ -14,12 +14,12 @@ class Preparation:
     @staticmethod
     def new_instance(spreadsheet: Spreadsheet, base: str, ticket: int, instance: int):
         destination = "%s/%d" % (base, ticket)
-        return Preparation(spreadsheet, destination, '%s/external_%d_%d.xls' % (destination, ticket, instance))
+        return Preparation(spreadsheet, destination, '%s/external_%d_%d.xlsx' % (destination, ticket, instance))
 
     @staticmethod
     def new_instance_complete(spreadsheet: Spreadsheet, base: str, ticket: int):
         destination = "%s/%d" % (base, ticket)
-        return Preparation(spreadsheet, destination, '%s/complete_external_%d.xls' % (destination, ticket))
+        return Preparation(spreadsheet, destination, '%s/complete_external_%d.xlsx' % (destination, ticket))
         
     def __init__(self, spreadsheet: Spreadsheet, destination: str, spreadsheet_file: str):
         self.spreadsheet = spreadsheet
