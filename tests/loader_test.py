@@ -13,6 +13,12 @@ class TestLoader(unittest.TestCase):
     reads_with_obligatory_data = [RawRead(forward_read='fw_read', reverse_read='rv_read', sample_name='sampname', sample_accession='sampac', taxon_id='taxid', library_name='libnam'),
                   RawRead(forward_read='fw_read', reverse_read='rv_read', sample_name='sampname', sample_accession='sampac', taxon_id='taxid', library_name='libnam')]
 
+    def test_string_xlsx(self):
+        loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_string.xlsx'))
+        actual = loader.load()
+        self.assertEqual(1.25, actual.size)
+        self.assertEqual("01/01/2030", actual.limit)
+
     def test_empty_end_lanes_trimmed(self):
         loader = SpreadsheetLoader(os.path.join(self.data_dir, 'test_upload.xls'))
 
