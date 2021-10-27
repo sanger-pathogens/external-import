@@ -42,7 +42,7 @@ def split_spreadsheet_by_breakpoint(sheet,arguments):
     current_position = 0
     while file_ended == False:
         generator = OutputSpreadsheetGenerator(sheet, current_position)
-        workbook, file_ended, current_position = generator.build(arguments.breakpoint, arguments.download)
+        workbook, file_ended, current_position = generator.build(arguments.breakpoint, False)
         preparation = Preparation.new_instance(sheet, arguments.output, arguments.ticket, instance)
         preparation.create_destination_directory()
         preparation.save_workbook(workbook)
