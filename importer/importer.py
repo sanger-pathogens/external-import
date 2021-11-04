@@ -3,21 +3,21 @@ import os
 
 class DataImporter:
 
-    BASE_DATA_PATH = "/lustre/scratch118/infgen/pathogen/pathpipe/external_seq_data"
+    BASE_DATA_PATH = "/lustre/scratch118/infgen/pathogen/pathpipe/external_seq_data" # Only used in tests
 
     @staticmethod
     def new_instance(base: str, ticket: int, database: str):
         loader_list = []
         destination = "%s/%d" % (base, ticket)
-        for index, file in enumerate(glob.glob(f"{DataImporter.BASE_DATA_PATH}/{ticket}/external_{ticket}_*.xlsx",
+        for index, file in enumerate(glob.glob(f"{base}/{ticket}/external_{ticket}_*.xlsx",
                                                recursive=False)):
             command = DataImporter(destination, ticket, index, database)
             loader_list.append(command)
         return loader_list
     
     @staticmethod
-    def get_complete_manifest_for_ticket(ticket: int):
-        return f"{DataImporter.BASE_DATA_PATH}/{ticket}/complete_external_{ticket}.xlsx"
+    def get_complete_manifest_for_ticket(ticket: int, base: str):
+        return f"{base}/{ticket}/complete_external_{ticket}.xlsx"
 
     def __init__(self, destination: str, ticket: int, index: int, database: str):
         self.destination = destination

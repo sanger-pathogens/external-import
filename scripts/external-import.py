@@ -50,7 +50,7 @@ def split_spreadsheet_by_breakpoint(sheet,arguments):
 
 def load(arguments: argparse.Namespace):
     # Split complete spreadsheet by breakpoint
-    complete_spreadsheet = DataImporter.get_complete_manifest_for_ticket(arguments.ticket)
+    complete_spreadsheet = DataImporter.get_complete_manifest_for_ticket(arguments.ticket, arguments.output)
     loader = SpreadsheetLoader(complete_spreadsheet)
     sheet = loader.load()
     split_spreadsheet_by_breakpoint(sheet, arguments)
