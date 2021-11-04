@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
-sys.path.insert(0,"/nfs/users/nfs_p/pathpipe/mm6/external-import/")
-
 import argparse
 from sys import argv
 
