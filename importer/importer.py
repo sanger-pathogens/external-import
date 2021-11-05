@@ -3,8 +3,6 @@ import os
 
 class DataImporter:
 
-    BASE_DATA_PATH = "/lustre/scratch118/infgen/pathogen/pathpipe/external_seq_data" # Only used in tests
-
     @staticmethod
     def new_instance(base: str, ticket: int, database: str):
         loader_list = []
