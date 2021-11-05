@@ -3,21 +3,19 @@ import os
 
 class DataImporter:
 
-    BASE_DATA_PATH = "/lustre/scratch118/infgen/pathogen/pathpipe/external_seq_data"
-
     @staticmethod
     def new_instance(base: str, ticket: int, database: str):
         loader_list = []
         destination = "%s/%d" % (base, ticket)
-        for index, file in enumerate(glob.glob(f"{DataImporter.BASE_DATA_PATH}/{ticket}/external_{ticket}_*.xlsx",
+        for index, file in enumerate(glob.glob(f"{base}/{ticket}/external_{ticket}_*.xls",
                                                recursive=False)):
             command = DataImporter(destination, ticket, index, database)
             loader_list.append(command)
         return loader_list
     
     @staticmethod
-    def get_complete_manifest_for_ticket(ticket: int):
-        return f"{DataImporter.BASE_DATA_PATH}/{ticket}/complete_external_{ticket}.xlsx"
+    def get_complete_manifest_for_ticket(ticket: int, base: str):
+        return f"{base}/{ticket}/complete_external_{ticket}.xlsx"
 
     def __init__(self, destination: str, ticket: int, index: int, database: str):
         self.destination = destination
@@ -41,7 +39,7 @@ bsub -o {command.destination}/external_{command.ticket}_{command.index}.log -e {
   -d {command.database} \\
   -f {command.destination} \\
   -p /lustre/scratch118/infgen/pathogen/pathpipe/{command.database}/seq-pipelines \\
-  {command.destination}/external_{command.ticket}_{command.index}.xlsx
+  {command.destination}/external_{command.ticket}_{command.index}.xls
 
 """)
         dependency = f"external_{command.ticket}_{command.index}"
@@ -55,7 +53,7 @@ bsub -o {command.destination}/external_{command.ticket}.%J.%I.o -e {command.dest
   -d {command.database} \\
   -f {command.destination} \\
   -p /lustre/scratch118/infgen/pathogen/pathpipe/{command.database}/seq-pipelines \\
-  {command.destination}/external_{command.ticket}_\$LSB_JOBINDEX.xlsx
+  {command.destination}/external_{command.ticket}_\$LSB_JOBINDEX.xls
 
 """)
         command_file.write("""

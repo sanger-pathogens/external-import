@@ -3,6 +3,7 @@ from shutil import copyfile
 
 import sys
 import openpyxl
+import xlwt
 import pandas as pd
 
 from importer.model import Spreadsheet
@@ -10,16 +11,15 @@ from importer.run_bash_command import runrealcmd
 
 class Preparation:
 
+    @staticmethod
+    def new_instance(spreadsheet: Spreadsheet, base: str, ticket: int, instance: int, excel_type: str):
+        destination = "%s/%d" % (base, ticket)
+        return Preparation(spreadsheet, destination, '%s/external_%d_%d.%s' % (destination, ticket, instance, excel_type))
 
     @staticmethod
-    def new_instance(spreadsheet: Spreadsheet, base: str, ticket: int, instance: int):
+    def new_instance_complete(spreadsheet: Spreadsheet, base: str, ticket: int, excel_type:str):
         destination = "%s/%d" % (base, ticket)
-        return Preparation(spreadsheet, destination, '%s/external_%d_%d.xlsx' % (destination, ticket, instance))
-
-    @staticmethod
-    def new_instance_complete(spreadsheet: Spreadsheet, base: str, ticket: int):
-        destination = "%s/%d" % (base, ticket)
-        return Preparation(spreadsheet, destination, '%s/complete_external_%d.xlsx' % (destination, ticket))
+        return Preparation(spreadsheet, destination, '%s/complete_external_%d.%s' % (destination, ticket, excel_type))
         
     def __init__(self, spreadsheet: Spreadsheet, destination: str, spreadsheet_file: str):
         self.spreadsheet = spreadsheet
@@ -86,7 +86,83 @@ def submit_commands(df):
     else:
         print ('No new files found to be downloaded')
 
-class OutputSpreadsheetGenerator:
+class OutputSpreadsheetGeneratorXLS:
+
+    FILE_ENDING = "xls"
+
+    def __init__(self, spreadsheet: Spreadsheet, current_position: int):
+        self.spreadsheet = spreadsheet
+        self.row = current_position
+        self.status_closed = False
+        self.workbook = xlwt.Workbook()
+        self.sheet = self.workbook.add_sheet('Sheet1')
+
+    def build(self, breakpoint: int, download):
+        self.build_import_info()
+        self.build_read_headers()
+        self.build_read_data(breakpoint if breakpoint > 0 else sys.maxsize, download)
+        return self.workbook, self.status_closed, self.row
+
+    def build_import_info(self):
+
+        self.write_string(0, 'Supplier Name', self.spreadsheet.supplier)
+        self.write_string(1, 'Supplier Organisation', self.spreadsheet.organisation)
+        self.write_string(2, 'Sanger Contact Name', self.spreadsheet.contact)
+        self.write_string(3, 'Sequencing Technology', self.spreadsheet.technology)
+        self.write_string(4, 'Study Name', self.spreadsheet.name)
+        self.write_string(5, 'Study Accession number', self.spreadsheet.accession)
+        self.write_string(6, 'Total size of files in GBytes', self.spreadsheet.size)
+        self.write_string(7, 'Data to be kept until', self.spreadsheet.limit)
+
+
+    def build_read_data(self, breakpoint: int, download):
+        for read in range(breakpoint):
+            position = read + 10
+            end_reached = self.row == len(self.spreadsheet.reads)
+            if end_reached:
+                self.status_closed = True
+                break
+            current_row = self.spreadsheet.reads[self.row]
+            if download:
+                if current_row.reverse_read == 'T':
+                    forward_read_file = current_row.forward_read + '_1.fastq.gz'
+                    self.sheet.write(position, 0, forward_read_file)
+                    reverse_read_file = current_row.forward_read + '_2.fastq.gz'
+                    self.sheet.write(position, 1, reverse_read_file)
+                elif current_row.reverse_read == 'F':
+                    forward_read_file = current_row.forward_read + '.fastq.gz'
+                    self.sheet.write(position, 0, forward_read_file)
+                    self.sheet.write(position, 1, '')
+                else:
+                    print('WARNING: some lines have invalid entries for the double-ended column (not T/F)')
+            else:
+                self.sheet.write(position, 0, current_row.forward_read)
+                if current_row.reverse_read is not None:
+                    self.sheet.write(position, 1, current_row.reverse_read)
+            self.sheet.write(position, 2, current_row.sample_name)
+            self.sheet.write(position, 4, current_row.taxon_id)
+            self.sheet.write(position, 5, current_row.library_name)
+            self.row += 1
+        if self.row == len(self.spreadsheet.reads):
+            self.status_closed = True
+
+    def build_read_headers(self):
+        index = 0
+        for header in ['Filename', 'Mate File', 'Sample Name', 'Sample Accession number', 'Taxon ID', 'Library Name',
+                       'Fragment Size', 'Read Count', 'Base Count', 'Comments']:
+            self.sheet.write(9, index, header)
+            index += 1
+
+    def not_applicable(self, row, title):
+        self.write_string(row, title, 'Unused field')
+
+    def write_string(self, row, title, value):
+        self.sheet.write(row, 0, title)
+        self.sheet.write(row, 1, value)
+
+class OutputSpreadsheetGeneratorXLSX:
+
+    FILE_ENDING = "xlsx"
 
     def __init__(self, spreadsheet: Spreadsheet, current_position: int):
         self.spreadsheet = spreadsheet

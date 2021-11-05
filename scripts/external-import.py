@@ -9,7 +9,8 @@ from importer.loader import SpreadsheetLoader
 from importer.pfchecks import print_pf_checks
 from importer.validation import validate_spreadsheet
 from importer.writer import Preparation, \
-    OutputSpreadsheetGenerator
+    OutputSpreadsheetGeneratorXLS, \
+    OutputSpreadsheetGeneratorXLSX
 
 def validate(arguments: argparse.Namespace):
     loader = SpreadsheetLoader(arguments.spreadsheet)
@@ -25,9 +26,9 @@ def prepare(arguments: argparse.Namespace):
     loader = SpreadsheetLoader(arguments.spreadsheet)
     sheet = loader.load()
 
-    generator = OutputSpreadsheetGenerator(sheet, 0)
+    generator = OutputSpreadsheetGeneratorXLSX(sheet, 0)
     workbook, file_ended, current_position = generator.build(0, arguments.download)
-    preparation = Preparation.new_instance_complete(sheet, arguments.output, arguments.ticket)
+    preparation = Preparation.new_instance_complete(sheet, arguments.output, arguments.ticket, generator.FILE_ENDING)
     preparation.create_destination_directory()
     preparation.save_workbook(workbook)
     if arguments.download:
@@ -41,16 +42,16 @@ def split_spreadsheet_by_breakpoint(sheet,arguments):
     instance = 0
     current_position = 0
     while file_ended == False:
-        generator = OutputSpreadsheetGenerator(sheet, current_position)
+        generator = OutputSpreadsheetGeneratorXLS(sheet, current_position)
         workbook, file_ended, current_position = generator.build(arguments.breakpoint, False)
-        preparation = Preparation.new_instance(sheet, arguments.output, arguments.ticket, instance)
+        preparation = Preparation.new_instance(sheet, arguments.output, arguments.ticket, instance, generator.FILE_ENDING)
         preparation.create_destination_directory()
         preparation.save_workbook(workbook)
         instance += 1
 
 def load(arguments: argparse.Namespace):
     # Split complete spreadsheet by breakpoint
-    complete_spreadsheet = DataImporter.get_complete_manifest_for_ticket(arguments.ticket)
+    complete_spreadsheet = DataImporter.get_complete_manifest_for_ticket(arguments.ticket, arguments.output)
     loader = SpreadsheetLoader(complete_spreadsheet)
     sheet = loader.load()
     split_spreadsheet_by_breakpoint(sheet, arguments)

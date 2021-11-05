@@ -4,7 +4,7 @@ import os
 import xlrd
 import openpyxl
 from importer.model import Spreadsheet, RawRead
-from importer.writer import Preparation, OutputSpreadsheetGenerator, create_commands, submit_commands
+from importer.writer import Preparation, OutputSpreadsheetGeneratorXLS, OutputSpreadsheetGeneratorXLSX, create_commands, submit_commands
 import pandas as pd
 from testfixtures import TempDirectory
 
@@ -23,7 +23,7 @@ class TestFileCopy(unittest.TestCase):
             RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read='PAIR1_2.fastq.gz', sample_name='SAMPLE1',
                     taxon_id='1280', library_name='LIB1', sample_accession=None),
             RawRead(forward_read='PAIR2_1.fastq.gz', reverse_read='PAIR2_2.fastq.gz', sample_name='SAMPLE2',
-                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), 'destination', 0, 0)
+                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), 'destination', 0, 0, "xlsx")
         under_test.copy_files('source')
         self.assertEqual(copyfile_patch.call_args_list,
                           [call('source/PAIR1_1.fastq.gz', 'destination/0/PAIR1_1.fastq.gz'),
@@ -37,7 +37,7 @@ class TestFileCopy(unittest.TestCase):
             RawRead(forward_read='PAIR1_1.fastq.gz', reverse_read='PAIR1_2.fastq.gz', sample_name='SAMPLE1',
                     taxon_id='1280', library_name='LIB1', sample_accession=None),
             RawRead(forward_read='SINGLE.fastq.gz', reverse_read=None, sample_name='SAMPLE2',
-                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), 'destination', 0, 0)
+                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), 'destination', 0, 0, "xlsx")
         under_test.copy_files('source')
         self.assertEqual(copyfile_patch.call_args_list,
                           [call('source/PAIR1_1.fastq.gz', 'destination/0/PAIR1_1.fastq.gz'),
@@ -53,21 +53,22 @@ class TestFileDownload(unittest.TestCase):
         self.tempdir.write('2/Accession1_2.fastq.gz',b'the text')
         self.tempdir_path = self.tempdir.path
         print('temp',self.tempdir_path)
+        excel_type="xlsx"
         self.under_test1 = Preparation.new_instance(Spreadsheet.new_instance("MyStudy", [
             RawRead(forward_read='Accession1', reverse_read='T', sample_name='SAMPLE1',
                     taxon_id='1280', library_name='LIB1', sample_accession=None),
             RawRead(forward_read='Accession2', reverse_read='T', sample_name='SAMPLE2',
-                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), self.tempdir_path, 0, 0)
+                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), self.tempdir_path, 0, 0, excel_type)
         self.under_test2 = Preparation.new_instance(Spreadsheet.new_instance("MyStudy", [
             RawRead(forward_read='Accession1', reverse_read='T', sample_name='SAMPLE1',
                     taxon_id='1280', library_name='LIB1', sample_accession=None),
             RawRead(forward_read='Accession2', reverse_read='T', sample_name='SAMPLE2',
-                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), self.tempdir_path, 1, 0)
+                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), self.tempdir_path, 1, 0, excel_type)
         self.under_test3 = Preparation.new_instance(Spreadsheet.new_instance("MyStudy", [
             RawRead(forward_read='Accession1', reverse_read='T', sample_name='SAMPLE1',
                     taxon_id='1280', library_name='LIB1', sample_accession=None),
             RawRead(forward_read='Accession2', reverse_read='T', sample_name='SAMPLE2',
-                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), self.tempdir_path, 2, 0)
+                    taxon_id='1280', library_name='LIB2', sample_accession=None)]), self.tempdir_path, 2, 0, excel_type)
 
     def tearDown(self):
         self.tempdir.cleanup()
@@ -233,7 +234,7 @@ class TestXlsGeneration(unittest.TestCase):
                                      BREAKPOINT_FIRSTSHEET.cell_value(row, col))
 
     def run_function(self, sheet):
-        generator = OutputSpreadsheetGenerator(sheet, A_POSITION)
+        generator = OutputSpreadsheetGeneratorXLSX(sheet, A_POSITION)
         workbook, file_ended, current_position = generator.build(A_BREAKPOINT, False)
         workbook.save('workbook.xlsx')
         self.assertEqual((current_position, file_ended), (2, True))
@@ -261,7 +262,7 @@ class TestXlsGeneration(unittest.TestCase):
 
     def test_of_preparation_initialization(self):
         spreadsheet = Spreadsheet()
-        preparation = Preparation.new_instance(spreadsheet, AN_OUTPUT, A_TICKET, AN_INSTANCE)
+        preparation = Preparation.new_instance(spreadsheet, AN_OUTPUT, A_TICKET, AN_INSTANCE, "xlsx")
         self.assert_preparation(preparation, spreadsheet)
 
     def assert_preparation(self, preparation, spreadsheet):
