@@ -127,12 +127,12 @@ optional arguments:
                         breaking
 
 ```
-Base directory for import data is ```/data/pam/applications/vr-pipelines/external_seq_data```
+Base directory for import data is ```/data/pam/applications/external_seq_data```
 
 Should be run using bsub to avoid timeout:
 ```
 bsub -o prepare.o -e prepare.e -M2000 -R "select[mem>2000] rusage[mem=2000]" external-import.py prepare \
-   -o /data/pam/applications/vr-pipelines/external_seq_data \
+   -o /data/pam/applications/external_seq_data \
    -s spreadsheet.xls \
    -i inputdir \
    -t 123456 
