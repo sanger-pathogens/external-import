@@ -38,7 +38,7 @@ bsub -o {command.destination}/external_{command.ticket}_{command.index}.log -e {
   -R "select[mem>2000] rusage[mem=2000]" update_pipeline_from_spreadsheet.pl \\
   -d {command.database} \\
   -f {command.destination} \\
-  -p /lustre/scratch118/infgen/pathogen/pathpipe/{command.database}/seq-pipelines \\
+  -p /data/pam/applications/vr-pipelines/{command.database}/seq-pipelines \\
   {command.destination}/external_{command.ticket}_{command.index}.xls
 
 """)
@@ -52,7 +52,7 @@ bsub -o {command.destination}/external_{command.ticket}.%J.%I.o -e {command.dest
   -R "select[mem>2000] rusage[mem=2000]" update_pipeline_from_spreadsheet.pl \\
   -d {command.database} \\
   -f {command.destination} \\
-  -p /lustre/scratch118/infgen/pathogen/pathpipe/{command.database}/seq-pipelines \\
+  -p /data/pam/applications/vr-pipelines/{command.database}/seq-pipelines \\
   {command.destination}/external_{command.ticket}_\$LSB_JOBINDEX.xls
 
 """)
