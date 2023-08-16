@@ -19,7 +19,6 @@ def validate_spreadsheet(spreadsheet: Spreadsheet, part_of_internal_study: bool,
     if not download_reads_from_ena:
         validators.append(validate_files_are_compressed)
         validators.append(validate_pair_naming_convention)
-        validators.append(validate_files_correctly_marked)
     else:
         validators.append(check_double_ended_column_is_T_or_F)
     if part_of_internal_study:
@@ -80,18 +79,6 @@ def __validate_files_are_compressed_for_read(read: RawRead) -> List[str]:
             result.append("Reverse read file is not correctly formatted for %s" % str(read))
     return result
 
-def validate_files_correctly_marked(spreadsheet: Spreadsheet) -> List[str]:
-    read_errors = [__validate_files_have_no_duplicate_direction_markers(read) for read in spreadsheet.reads]
-    return [item for sublist in read_errors for item in sublist]
-
-def __validate_files_have_no_duplicate_direction_markers(read: RawRead) -> List[str]:
-    result = []
-    if read.reverse_read:
-        if read.forward_read.endswith("_1_1.fastq.gz"):
-            result.append("Too many forward read markers '_1' in forward read filename: %s" % read.forward_read)
-        if read.reverse_read.endswith("_2_2.fastq.gz"):
-            result.append("Too many reverse read markers '_2' in reverse read filename: %s" % read.reverse_read)
-    return result
 
 def validate_pair_naming_convention(spreadsheet: Spreadsheet) -> List[str]:
     read_errors = [__validate_pair_naming_convention_for_read(read) for read in spreadsheet.reads]
