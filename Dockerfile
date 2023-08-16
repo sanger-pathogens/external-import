@@ -13,7 +13,7 @@ RUN apt update -qq -y && \
     && apt clean -y
 
 #install requests library
-RUN pip3 install requests
+RUN pip3 install requests pandas
 
 #Install enaBrowserTools
 RUN wget https://github.com/enasequence/enaBrowserTools/archive/v${ENA_BROWSER_TOOLS_VERSION}.tar.gz \
